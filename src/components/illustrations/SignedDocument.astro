@@ -1,0 +1,200 @@
+---
+/**
+ * Um contrato que se assina na tela: o convite sai pelo WhatsApp, os signatários vão ficando
+ * prontos, a assinatura se risca e o selo encaixa — o mesmo gesto do esquadro.
+ */
+const signers = [
+  { name: 'Contratante', channel: 'WhatsApp' },
+  { name: 'Contratada', channel: 'e-mail' },
+];
+---
+
+<figure class="doc" aria-label="Um contrato sendo assinado por duas partes, com selo de validade ao final">
+  <div class="doc__paper" aria-hidden="true">
+    <span class="doc__line doc__line--title"></span>
+    <span class="doc__line"></span>
+    <span class="doc__line"></span>
+    <span class="doc__line doc__line--short"></span>
+    <span class="doc__line"></span>
+    <span class="doc__line doc__line--mid"></span>
+
+    <div class="doc__signature">
+      <svg viewBox="0 0 200 50" class="doc__ink">
+        <path
+          d="M6 36 C 20 8, 30 8, 34 30 S 48 44, 58 22 S 74 6, 80 30 S 96 40, 108 24 C 116 14, 124 16, 128 28 S 150 38, 194 18"
+          pathLength="1"
+        ></path>
+      </svg>
+      <span class="doc__sign-line"></span>
+    </div>
+
+    <span class="doc__seal">
+      <svg viewBox="10 28 80 48" width="26" height="16">
+        <rect x="10" y="28" width="80" height="16"></rect>
+        <rect x="74" y="28" width="16" height="48"></rect>
+        <rect x="54" y="48" width="16" height="16" class="doc__seal-dot"></rect>
+      </svg>
+      <span>ICP-Brasil · PAdES</span>
+    </span>
+  </div>
+
+  <ul class="doc__signers" role="list" aria-hidden="true">
+    {signers.map((signer, index) => (
+      <li class="doc__signer" style={`--i: ${index}`}>
+        <span>
+          {signer.name}
+          <small class="mono">via {signer.channel}</small>
+        </span>
+        <span class="doc__check mono">assinado</span>
+      </li>
+    ))}
+  </ul>
+</figure>
+
+<style>
+  .doc {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .doc__paper {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 0.875rem;
+    padding: clamp(1.5rem, 4vw, 2.25rem);
+    background: var(--c-paper);
+    min-height: 19rem;
+  }
+
+  .doc__line {
+    height: 0.5rem;
+    background: #d2d2cb;
+  }
+
+  .doc__line--title {
+    width: 55%;
+    height: 0.875rem;
+    background: var(--c-ink);
+  }
+
+  .doc__line--short {
+    width: 42%;
+  }
+
+  .doc__line--mid {
+    width: 70%;
+  }
+
+  .doc__signature {
+    margin-top: auto;
+    width: min(16rem, 70%);
+  }
+
+  .doc__ink {
+    width: 100%;
+    height: auto;
+    overflow: visible;
+  }
+
+  .doc__ink path {
+    fill: none;
+    stroke: var(--c-ink);
+    stroke-width: 2.5;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    stroke-dasharray: 1;
+    stroke-dashoffset: 1;
+    animation: sign 1.6s var(--ease-tool) 1.6s forwards;
+  }
+
+  .doc__sign-line {
+    display: block;
+    height: 1px;
+    background: var(--c-ink);
+  }
+
+  .doc__seal {
+    position: absolute;
+    right: clamp(1rem, 3vw, 1.75rem);
+    top: clamp(1rem, 3vw, 1.75rem);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 0.75rem;
+    background: var(--c-ink);
+    color: var(--c-paper);
+    font-family: var(--font-mono);
+    font-size: 0.6875rem;
+    letter-spacing: 0.04em;
+    animation: seal 0.55s var(--ease-snap) 3.3s both;
+  }
+
+  .doc__seal rect {
+    fill: var(--c-paper);
+  }
+
+  .doc__seal .doc__seal-dot {
+    fill: var(--c-mark);
+  }
+
+  .doc__signers {
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+    background: var(--c-line-dark);
+    border: 1px solid var(--c-line-dark);
+  }
+
+  .doc__signer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+    padding: 0.875rem 1rem;
+    background: var(--c-ink-2);
+    font-weight: 600;
+  }
+
+  .doc__signer small {
+    display: block;
+    margin-top: 0.125rem;
+    font-size: 0.6875rem;
+    font-weight: 400;
+    color: var(--c-steel);
+  }
+
+  .doc__check {
+    font-size: 0.75rem;
+    color: var(--c-ruler);
+    animation: appear 0.4s ease both;
+    animation-delay: calc(0.6s + var(--i) * 0.9s);
+  }
+
+  @keyframes sign {
+    to {
+      stroke-dashoffset: 0;
+    }
+  }
+
+  @keyframes seal {
+    from {
+      opacity: 0;
+      transform: scale(0.7) rotate(-6deg);
+    }
+  }
+
+  @keyframes appear {
+    from {
+      opacity: 0;
+      transform: translateX(-0.5rem);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .doc__ink path {
+      stroke-dashoffset: 0;
+    }
+  }
+</style>

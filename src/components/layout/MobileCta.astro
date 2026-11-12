@@ -1,0 +1,107 @@
+---
+/**
+ * Barra fixa no rodapé do celular: a ação principal sempre a um toque — é de onde vem
+ * a maior parte do tráfego de anúncio. Some quando o formulário já está na tela.
+ */
+import { site } from '~/config/site';
+import { whatsappUrl } from '~/lib/contact';
+
+interface Props {
+  cta: { label: string; href: string };
+}
+
+const { cta } = Astro.props;
+---
+
+<div class="mobile-cta" data-mobile-cta data-hidden="true">
+  <a
+    href={cta.href}
+    class="mobile-cta__primary"
+    data-track="barra-celular"
+    data-track-location="barra-celular"
+  >
+    {cta.label}
+    <span aria-hidden="true">¬</span>
+  </a>
+  {site.whatsapp && (
+    <a
+      href={whatsappUrl(site.whatsapp)}
+      class="mobile-cta__whatsapp"
+      target="_blank"
+      rel="noopener"
+      aria-label="Conversar pelo WhatsApp"
+      data-track-location="barra-celular"
+    >
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+        <path
+          d="M4 20l1.3-3.9A8 8 0 1 1 8 18.8L4 20z"
+          stroke="currentColor"
+          stroke-width="1.8"
+          stroke-linejoin="round"
+        />
+        <path d="M9 9.5c.4 2 1.8 3.6 4 4.6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" />
+      </svg>
+    </a>
+  )}
+</div>
+
+<style>
+  .mobile-cta {
+    display: none;
+  }
+
+  @media (max-width: 47.99rem) {
+    .mobile-cta {
+      position: fixed;
+      left: 0.75rem;
+      right: 0.75rem;
+      bottom: calc(0.75rem + env(safe-area-inset-bottom));
+      z-index: 40;
+      display: flex;
+      gap: 0.5rem;
+      transition:
+        transform 0.4s var(--ease-tool),
+        opacity 0.3s ease;
+    }
+
+    .mobile-cta[data-hidden='true'] {
+      transform: translateY(150%);
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    :global(html.menu-open) .mobile-cta {
+      display: none;
+    }
+  }
+
+  .mobile-cta__primary {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    min-height: 3.5rem;
+    padding: 0 1.25rem;
+    background: var(--c-ruler);
+    color: var(--c-ink);
+    font-weight: 700;
+    text-decoration: none;
+    box-shadow: 0 10px 30px rgb(0 0 0 / 0.35);
+  }
+
+  .mobile-cta__primary span {
+    font-size: 1.375rem;
+    font-weight: 800;
+  }
+
+  .mobile-cta__whatsapp {
+    display: grid;
+    place-items: center;
+    width: 3.5rem;
+    min-height: 3.5rem;
+    background: var(--c-ink);
+    color: var(--c-paper);
+    border: 1px solid var(--c-line-dark-2);
+    box-shadow: 0 10px 30px rgb(0 0 0 / 0.35);
+  }
+</style>

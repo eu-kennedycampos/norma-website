@@ -1,0 +1,68 @@
+---
+/**
+ * A faixa do metro articulado: corre devagar entre o topo e o conteúdo.
+ * Cada segmento tem 15 números a cada 100 px; o vermelho marca as dezenas de 50.
+ * Dois segmentos iguais e um deslocamento de exatamente um segmento fazem o laço sem emenda.
+ */
+const numbers = Array.from({ length: 15 }, (_, i) => (i + 1) * 10);
+---
+
+<div class="ruler" aria-hidden="true">
+  <div class="ruler__track">
+    {[0, 1].map(() => (
+      <div class="ruler__segment">
+        {numbers.map((n) => (
+          <span class:list={['ruler__number', { 'ruler__number--mark': n % 50 === 0 }]}>{n}</span>
+        ))}
+      </div>
+    ))}
+  </div>
+</div>
+
+<style>
+  .ruler {
+    height: 3.5rem;
+    overflow: hidden;
+    background: var(--c-ruler);
+    color: var(--c-ink);
+  }
+
+  .ruler__track {
+    display: flex;
+    width: 3000px;
+    animation: ruler-run 48s linear infinite;
+  }
+
+  .ruler__segment {
+    flex: 0 0 1500px;
+    height: 3.5rem;
+    display: flex;
+    background-image:
+      repeating-linear-gradient(90deg, var(--c-ink) 0 2px, transparent 2px 100px),
+      repeating-linear-gradient(90deg, var(--c-ink) 0 1px, transparent 1px 50px),
+      repeating-linear-gradient(90deg, var(--c-ink) 0 1px, transparent 1px 10px);
+    background-size:
+      100% 24px,
+      100% 16px,
+      100% 9px;
+    background-repeat: no-repeat;
+  }
+
+  .ruler__number {
+    flex: 0 0 100px;
+    padding: 1.75rem 0 0 0.375rem;
+    font-family: var(--font-mono);
+    font-size: 0.9375rem;
+    font-weight: 700;
+  }
+
+  .ruler__number--mark {
+    color: var(--c-mark);
+  }
+
+  @keyframes ruler-run {
+    to {
+      transform: translateX(-1500px);
+    }
+  }
+</style>

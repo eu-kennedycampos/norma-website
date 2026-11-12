@@ -1,0 +1,184 @@
+---
+/**
+ * Página de obrigado. Fora do índice, mas é a conversão de reserva do Google Ads:
+ * uma visita aqui só acontece depois de um lead enviado. O texto se ajusta ao interesse (?i=)
+ * e ao caminho do envio (?via=), lidos no navegador porque a página é estática.
+ */
+import Button from '~/components/ui/Button.astro';
+import { site } from '~/config/site';
+import BaseLayout from '~/layouts/BaseLayout.astro';
+import { whatsappUrl } from '~/lib/contact';
+---
+
+<BaseLayout
+  title="Pedido recebido"
+  description="Recebemos o seu contato. A resposta vem de quem vai construir."
+  noindex
+  bare
+>
+  <section class="thanks theme-dark" data-thanks>
+    <div class="container thanks__inner">
+      <div class="thanks__fit" aria-hidden="true">
+        <span class="thanks__arm"></span>
+        <span class="thanks__drop"></span>
+        <span class="thanks__piece"></span>
+      </div>
+
+      <div class="thanks__copy">
+        <p class="label">Recebido</p>
+
+        <div data-variant="sob-medida">
+          <h1 class="thanks__title">A primeira medida já foi tirada.</h1>
+          <p class="thanks__text">
+            Quem vai construir responde pessoalmente, com as primeiras perguntas sobre o seu processo.
+          </p>
+        </div>
+
+        <div data-variant="ponto" hidden>
+          <h1 class="thanks__title">Você está na lista do Norma Ponto.</h1>
+          <p class="thanks__text">Avisamos assim que o teste abrir — você entra antes de todo mundo.</p>
+        </div>
+
+        <div data-variant="assinatura" hidden>
+          <h1 class="thanks__title">Você está na lista do Norma Assinatura.</h1>
+          <p class="thanks__text">Avisamos assim que o teste abrir — você entra antes de todo mundo.</p>
+        </div>
+
+        {site.whatsapp && (
+          <p class="thanks__whatsapp" data-via="whatsapp" hidden>
+            A conversa abriu no WhatsApp numa nova aba. Não apareceu?{' '}
+            <a
+              href={whatsappUrl(site.whatsapp)}
+              target="_blank"
+              rel="noopener"
+              data-track-location="obrigado"
+            >
+              Abrir o WhatsApp
+            </a>
+          </p>
+        )}
+
+        <div class="thanks__actions">
+          <Button href="/" variant="outline">
+            Voltar ao início
+          </Button>
+        </div>
+      </div>
+    </div>
+  </section>
+</BaseLayout>
+
+<script>
+  const params = new URLSearchParams(window.location.search);
+  const interest = params.get('i');
+  const root = document.querySelector<HTMLElement>('[data-thanks]');
+  if (root && interest && root.querySelector(`[data-variant="${CSS.escape(interest)}"]`)) {
+    root.querySelectorAll<HTMLElement>('[data-variant]').forEach((block) => {
+      block.hidden = block.dataset.variant !== interest;
+    });
+  }
+  if (params.get('via') === 'whatsapp') {
+    root?.querySelector<HTMLElement>('[data-via="whatsapp"]')?.removeAttribute('hidden');
+  }
+</script>
+
+<style>
+  .thanks__inner {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(20rem, 100%), 1fr));
+    gap: clamp(2.5rem, 6vw, 4rem);
+    align-items: center;
+    min-height: calc(100dvh - var(--header-h) - 12rem);
+    padding-block: clamp(3rem, 8vw, 6rem);
+  }
+
+  /* A peça cai no encaixe do esquadro: a mesma animação da confirmação no guia de marca. */
+  .thanks__fit {
+    position: relative;
+    width: min(20rem, 100%);
+    aspect-ratio: 5 / 3;
+  }
+
+  .thanks__arm,
+  .thanks__drop,
+  .thanks__piece {
+    position: absolute;
+    display: block;
+  }
+
+  .thanks__arm {
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 33.333%;
+    background: var(--c-paper);
+  }
+
+  .thanks__drop {
+    right: 0;
+    top: 0;
+    width: 20%;
+    height: 100%;
+    background: var(--c-paper);
+  }
+
+  .thanks__piece {
+    left: 55%;
+    top: 41.666%;
+    width: 20%;
+    height: 33.333%;
+    background: var(--c-ruler);
+    animation: snap 1.1s cubic-bezier(0.5, 0, 0.3, 1.6) 0.3s both;
+  }
+
+  .thanks__copy {
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+  }
+
+  .thanks__copy > div {
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+  }
+
+  .thanks__copy > div[hidden] {
+    display: none;
+  }
+
+  .thanks__title {
+    font-size: clamp(2.25rem, 5vw, 4rem);
+  }
+
+  .thanks__text {
+    max-width: 32rem;
+    font-size: var(--fs-lead);
+    line-height: 1.6;
+    color: var(--fg-dim);
+  }
+
+  .thanks__whatsapp {
+    font-family: var(--font-mono);
+    font-size: 0.8125rem;
+    color: var(--fg-dim);
+  }
+
+  .thanks__whatsapp a {
+    color: var(--c-ruler);
+  }
+
+  .thanks__actions {
+    margin-top: 0.5rem;
+  }
+
+  @keyframes snap {
+    from {
+      transform: translate(-9rem, -7rem) rotate(-90deg);
+      opacity: 0;
+    }
+    30% {
+      opacity: 1;
+    }
+  }
+</style>

@@ -1,0 +1,200 @@
+---
+import Button from '~/components/ui/Button.astro';
+import SquareDiagram from '~/components/illustrations/SquareDiagram.astro';
+---
+
+<section class="hero theme-dark" aria-labelledby="hero-title">
+  <div class="container hero__inner">
+    <div class="hero__meta">
+      <p class="label">Norma Tecnologia</p>
+      <p class="label">Sistemas sob medida para empresas e indústrias</p>
+    </div>
+
+    <h1 id="hero-title" class="hero__title">
+      <span class="hero__line">Software com o</span>
+      <span class="hero__fit">
+        <span class="hero__gauge" aria-hidden="true">
+          <span class="hero__gauge-label">sob medida</span>
+          <span class="hero__gauge-line"></span>
+        </span>
+        <span class="hero__stretch">formato</span>
+      </span>
+      <span class="hero__line">da sua empresa.</span>
+    </h1>
+
+    <div class="hero__bottom">
+      <div class="hero__copy">
+        <p class="hero__lead">
+          Primeiro a gente conhece a sua empresa por dentro. Depois constrói o sistema em volta do jeito que
+          ela trabalha — e ele continua crescendo junto com ela.
+        </p>
+        <div class="hero__actions" data-cta-zone>
+          <Button href="#contato" size="lg" track="pedir-medicao" trackLocation="topo">
+            Pedir uma medição
+          </Button>
+          <Button
+            href="#implantacao"
+            variant="outline"
+            size="lg"
+            track="ver-implantacao"
+            trackLocation="topo"
+          >
+            Ver como implantamos
+          </Button>
+        </div>
+      </div>
+      <SquareDiagram class="hero__diagram" />
+    </div>
+  </div>
+</section>
+
+<style>
+  .hero__inner {
+    display: flex;
+    flex-direction: column;
+    gap: clamp(2.5rem, 5vw, 3.5rem);
+    padding-block: clamp(2.5rem, 6vw, 4.5rem) clamp(3rem, 6vw, 4.5rem);
+  }
+
+  .hero__meta {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 0.75rem 2rem;
+    padding-bottom: 1.25rem;
+    border-bottom: 1px solid var(--line);
+    animation: fade-in 0.8s var(--ease-out) both;
+  }
+
+  .hero__title {
+    display: flex;
+    flex-direction: column;
+    gap: 0.12em;
+    font-size: var(--fs-display);
+    line-height: 0.96;
+    letter-spacing: -0.035em;
+    text-wrap: initial;
+  }
+
+  /* O título é o maior elemento da tela (LCP): só desliza, nunca começa invisível. */
+  .hero__line {
+    animation: slide 0.9s var(--ease-tool) both;
+  }
+
+  .hero__line:last-child {
+    animation-delay: 0.24s;
+  }
+
+  /* A palavra e a cota formam um bloco só: o colchete acompanha a largura da palavra
+     enquanto ela estica, sem posição absoluta — nada colide com a linha de cima. */
+  .hero__fit {
+    display: inline-flex;
+    flex-direction: column;
+    align-self: flex-start;
+    gap: 0.625rem;
+    margin-top: 0.12em;
+    color: var(--c-ruler);
+    animation: slide 0.9s var(--ease-tool) 0.12s both;
+  }
+
+  .hero__gauge {
+    display: flex;
+    flex-direction: column;
+    gap: 0.375rem;
+  }
+
+  .hero__gauge-label {
+    font-family: var(--font-mono);
+    font-size: 0.6875rem;
+    font-weight: 500;
+    line-height: 1;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+  }
+
+  .hero__gauge-line {
+    height: 0.75rem;
+    border: 2px solid currentColor;
+    border-bottom: 0;
+  }
+
+  .hero__stretch {
+    font-stretch: 62%;
+    animation: stretch 7s var(--ease-tool) 1.2s infinite;
+  }
+
+  .hero__bottom {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(24rem, 100%), 1fr));
+    gap: 2.5rem;
+    align-items: end;
+  }
+
+  .hero__copy {
+    display: flex;
+    flex-direction: column;
+    gap: 1.75rem;
+    min-width: 0;
+    animation: rise 0.9s var(--ease-tool) 0.4s both;
+  }
+
+  .hero__lead {
+    max-width: 35rem;
+    font-size: var(--fs-lead);
+    line-height: 1.55;
+    color: var(--fg-dim);
+  }
+
+  .hero__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.875rem;
+  }
+
+  :global(.hero__diagram) {
+    justify-self: end;
+    width: 100%;
+    max-width: 21rem;
+  }
+
+  @keyframes stretch {
+    0%,
+    8% {
+      font-stretch: 62%;
+    }
+    42%,
+    62% {
+      font-stretch: 125%;
+    }
+    96%,
+    100% {
+      font-stretch: 62%;
+    }
+  }
+
+  @keyframes rise {
+    from {
+      opacity: 0;
+      transform: translateY(0.4em);
+    }
+  }
+
+  @keyframes slide {
+    from {
+      transform: translateY(0.25em);
+    }
+  }
+
+  @keyframes fade-in {
+    from {
+      opacity: 0;
+    }
+  }
+
+  @media (max-width: 47.99rem) {
+    :global(.hero__diagram) {
+      justify-self: start;
+      max-width: 12rem;
+    }
+  }
+</style>

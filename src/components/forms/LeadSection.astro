@@ -1,0 +1,90 @@
+---
+/** A seção amarela do formulário: o fim de toda página, e o alvo de todo botão de ação. */
+import LeadForm from './LeadForm.astro';
+import { site } from '~/config/site';
+import { whatsappUrl } from '~/lib/contact';
+import type { LeadInterest } from '~/data/types';
+
+interface Props {
+  id: string;
+  label: string;
+  title: string;
+  text: string;
+  formId: string;
+  interest: LeadInterest;
+  submitLabel: string;
+  askTeamSize?: boolean;
+  askMessage?: boolean;
+  messagePlaceholder?: string;
+}
+
+const { id, label, title, text, ...form } = Astro.props;
+const titleId = `${id}-titulo`;
+---
+
+<section id={id} class="section theme-ruler lead" aria-labelledby={titleId} data-lead-section>
+  <div class="container lead__inner">
+    <div class="lead__copy" data-reveal>
+      <p class="label">{label}</p>
+      <h2 id={titleId} class="lead__title">
+        {title}
+      </h2>
+      <p class="lead__text">{text}</p>
+      {site.whatsapp && (
+        <p class="lead__alt">
+          Prefere conversar?{' '}
+          <a href={whatsappUrl(site.whatsapp)} target="_blank" rel="noopener" data-track-location={id}>
+            Chame no WhatsApp
+          </a>
+        </p>
+      )}
+    </div>
+    <div data-reveal style="--reveal-delay: 120ms">
+      <LeadForm
+        id={form.formId}
+        interest={form.interest}
+        submitLabel={form.submitLabel}
+        askTeamSize={form.askTeamSize}
+        askMessage={form.askMessage}
+        messagePlaceholder={form.messagePlaceholder}
+      />
+    </div>
+  </div>
+</section>
+
+<style>
+  .lead__inner {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(28rem, 100%), 1fr));
+    gap: clamp(2.5rem, 6vw, 3.5rem);
+    align-items: start;
+  }
+
+  .lead__copy {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+  }
+
+  .lead__title {
+    font-size: clamp(2.5rem, 5.4vw, 4.75rem);
+    line-height: 1;
+    letter-spacing: -0.035em;
+  }
+
+  .lead__text {
+    max-width: 32rem;
+    font-size: var(--fs-lead);
+    line-height: 1.6;
+  }
+
+  .lead__alt {
+    font-family: var(--font-mono);
+    font-size: 0.8125rem;
+  }
+
+  .lead__alt a {
+    font-weight: 700;
+    text-underline-offset: 0.2em;
+  }
+</style>

@@ -1,0 +1,41 @@
+---
+import Mark from './Mark.astro';
+
+interface Props {
+  /** Altura de referência do nome, em px. */
+  size?: number;
+  /** Nome do produto depois de "norma", em peso regular: "ponto", "assinatura". */
+  product?: string;
+  dot?: string;
+  class?: string;
+}
+
+const { size = 26, product, dot, class: className } = Astro.props;
+---
+
+<span class:list={['logo', className]} style={`--logo-size: ${size}px`}>
+  <Mark size={Math.round(size * 1.55)} dot={dot} class="logo__symbol" />
+  <span class="logo__name wordmark">norma{product && <span class="logo__product"> {product}</span>}</span>
+</span>
+
+<style>
+  .logo {
+    display: inline-flex;
+    align-items: center;
+    gap: calc(var(--logo-size) * 0.4);
+  }
+
+  /* O esquadro senta na linha de base visual do nome, não no centro da caixa. */
+  :global(.logo__symbol) {
+    margin-top: calc(var(--logo-size) * 0.22);
+  }
+
+  .logo__name {
+    font-size: var(--logo-size);
+    white-space: nowrap;
+  }
+
+  .logo__product {
+    font-weight: 400;
+  }
+</style>

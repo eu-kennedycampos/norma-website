@@ -1,0 +1,55 @@
+---
+/**
+ * Abertura de seção: rótulo numerado, título e um parágrafo de apoio ao lado (ou embaixo, no celular).
+ */
+interface Props {
+  index?: string;
+  label: string;
+  title: string;
+  lead?: string;
+  /** id do título, para a seção apontar com aria-labelledby. */
+  titleId?: string;
+  level?: 'h1' | 'h2';
+}
+
+const { index, label, title, lead, titleId, level = 'h2' } = Astro.props;
+const Heading = level;
+---
+
+<header class="section-header" data-reveal>
+  <div class="section-header__title">
+    <p class="label">{index ? `${index} — ${label}` : label}</p>
+    <Heading id={titleId} class="section-header__heading">
+      {title}
+    </Heading>
+  </div>
+  {lead && <p class="section-header__lead">{lead}</p>}
+  <slot />
+</header>
+
+<style>
+  .section-header {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(26rem, 100%), 1fr));
+    gap: 1.5rem 2.5rem;
+    align-items: end;
+  }
+
+  .section-header__title {
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+    min-width: 0;
+  }
+
+  .section-header__heading {
+    font-size: var(--fs-h2);
+  }
+
+  .section-header__lead {
+    font-size: var(--fs-lead);
+    line-height: 1.6;
+    color: var(--fg-dim);
+    max-width: 38rem;
+  }
+</style>

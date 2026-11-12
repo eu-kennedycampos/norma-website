@@ -1,0 +1,239 @@
+---
+/**
+ * O mesmo formato de processo, duas vezes: cortado por um retângulo padrão (prateleira)
+ * e contornado exatamente (Norma). O contorno da Norma se risca quando entra na tela.
+ */
+interface Props {
+  variant: 'shelf' | 'norma';
+}
+
+const { variant } = Astro.props;
+const PROCESS =
+  'M40 60 L120 60 L120 30 L210 30 L210 80 L280 80 L280 170 L170 170 L170 195 L70 195 L70 140 L40 140 Z';
+const uid = `shelf-${variant}`;
+---
+
+{variant === 'shelf' ? (
+  <figure class="shelf shelf--shelf">
+    <figcaption class="shelf__caption">
+      <strong>Prateleira</strong>
+      <span class="label">o seu processo, cortado no padrão</span>
+    </figcaption>
+    <svg
+      viewBox="0 0 320 220"
+      role="img"
+      aria-label="O formato do processo cortado por um retângulo padrão: o que fica de fora vira planilha, o que sobra dentro é função paga e sem uso"
+    >
+      <defs>
+        <pattern
+          id={`${uid}-hatch`}
+          width="6"
+          height="6"
+          patternUnits="userSpaceOnUse"
+          patternTransform="rotate(45)"
+        >
+          <rect width="2" height="6" class="shelf__hatch" />
+        </pattern>
+        <pattern id={`${uid}-dots`} width="8" height="8" patternUnits="userSpaceOnUse">
+          <circle cx="2" cy="2" r="1.1" class="shelf__dot" />
+        </pattern>
+        <clipPath id={`${uid}-clip`}>
+          <path d={PROCESS} />
+        </clipPath>
+      </defs>
+      <rect x="70" y="50" width="180" height="120" fill={`url(#${uid}-dots)`} />
+      <path d={PROCESS} fill={`url(#${uid}-hatch)`} />
+      <rect x="70" y="50" width="180" height="120" class="shelf__fit" clip-path={`url(#${uid}-clip)`} />
+      <rect x="70" y="50" width="180" height="120" fill="none" class="shelf__box" />
+      <path d={PROCESS} fill="none" class="shelf__outline" />
+    </svg>
+    <ul role="list" class="shelf__legend">
+      <li>
+        <span class="shelf__key shelf__key--hatch" aria-hidden="true" />
+        fica de fora: vira planilha
+      </li>
+      <li>
+        <span class="shelf__key shelf__key--dots" aria-hidden="true" />
+        sobra dentro: função paga e sem uso
+      </li>
+    </ul>
+  </figure>
+) : (
+  <figure class="shelf shelf--norma" data-reveal>
+    <figcaption class="shelf__caption">
+      <strong>Norma</strong>
+      <span class="label">o sistema medido no seu processo</span>
+    </figcaption>
+    <svg
+      viewBox="0 0 320 220"
+      role="img"
+      aria-label="O mesmo formato de processo, contornado exatamente pelo sistema, com marcas de corte nos cantos"
+    >
+      <path d={PROCESS} class="shelf__fill" />
+      <path d={PROCESS} fill="none" class="shelf__trace" pathLength="1" />
+      <g class="shelf__crop">
+        <line x1="22" y1="30" x2="34" y2="30" />
+        <line x1="40" y1="12" x2="40" y2="24" />
+        <line x1="286" y1="30" x2="298" y2="30" />
+        <line x1="280" y1="12" x2="280" y2="24" />
+        <line x1="22" y1="195" x2="34" y2="195" />
+        <line x1="40" y1="201" x2="40" y2="213" />
+        <line x1="286" y1="195" x2="298" y2="195" />
+        <line x1="280" y1="201" x2="280" y2="213" />
+      </g>
+    </svg>
+    <ul role="list" class="shelf__legend">
+      <li>
+        <span class="shelf__key shelf__key--fill" aria-hidden="true" />
+        cada regra do seu negócio, dentro do sistema
+      </li>
+      <li>
+        <span class="shelf__key shelf__key--line" aria-hidden="true" />
+        nada sobrando, nada faltando
+      </li>
+    </ul>
+  </figure>
+)}
+
+<style>
+  .shelf {
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+    padding: clamp(1.25rem, 3vw, 2rem);
+    border: 1px solid var(--line);
+  }
+
+  .shelf--shelf {
+    background: var(--c-paper-2);
+  }
+
+  .shelf--norma {
+    border-color: var(--c-ink);
+    background: var(--c-paper);
+  }
+
+  .shelf__caption {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 0.5rem 1rem;
+  }
+
+  .shelf__caption strong {
+    font-size: 1.375rem;
+    font-weight: 800;
+  }
+
+  .shelf__caption .label {
+    text-transform: none;
+    letter-spacing: 0;
+  }
+
+  .shelf svg {
+    width: 100%;
+    height: auto;
+  }
+
+  .shelf__hatch {
+    fill: var(--c-mark);
+  }
+
+  .shelf__dot {
+    fill: var(--c-steel);
+  }
+
+  .shelf__fit {
+    fill: #c9c9c2;
+  }
+
+  .shelf__box {
+    stroke: var(--c-ink);
+    stroke-width: 2;
+    stroke-dasharray: 6 4;
+  }
+
+  .shelf__outline {
+    stroke: var(--c-ink);
+    stroke-width: 1;
+  }
+
+  .shelf__fill {
+    fill: var(--c-ruler);
+  }
+
+  .shelf__trace {
+    stroke: var(--c-ink);
+    stroke-width: 3;
+    stroke-linejoin: miter;
+    stroke-dasharray: 1;
+    stroke-dashoffset: 0;
+  }
+
+  /* Riscado só quando a figura entra na tela; sem JS, o contorno já aparece completo. */
+  :global(html.js) .shelf--norma .shelf__trace {
+    stroke-dashoffset: 1;
+  }
+
+  :global(html.js) .shelf--norma:global(.is-visible) .shelf__trace {
+    animation: trace 2.4s var(--ease-tool) 0.3s forwards;
+  }
+
+  .shelf__crop line {
+    stroke: var(--c-ink);
+    stroke-width: 1.2;
+  }
+
+  .shelf__legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem 1.25rem;
+    font-size: 0.875rem;
+    color: var(--fg-dim);
+  }
+
+  .shelf__legend li {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .shelf__key {
+    flex: none;
+    width: 0.875rem;
+    height: 0.875rem;
+  }
+
+  .shelf__key--hatch {
+    border: 1px solid var(--c-mark);
+    background: repeating-linear-gradient(45deg, var(--c-mark) 0 2px, transparent 2px 5px);
+  }
+
+  .shelf__key--dots {
+    border: 1px solid var(--c-steel);
+    background: radial-gradient(var(--c-steel) 30%, transparent 32%) 0 0 / 5px 5px;
+  }
+
+  .shelf__key--fill {
+    border: 1px solid var(--c-ink);
+    background: var(--c-ruler);
+  }
+
+  .shelf__key--line {
+    height: 2px;
+    background: var(--c-ink);
+  }
+
+  @keyframes trace {
+    to {
+      stroke-dashoffset: 0;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    :global(html.js) .shelf--norma .shelf__trace {
+      stroke-dashoffset: 0;
+    }
+  }
+</style>

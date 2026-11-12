@@ -1,0 +1,165 @@
+---
+import Logo from '~/components/brand/Logo.astro';
+import { mainNav, productLinks, site } from '~/config/site';
+import { whatsappUrl } from '~/lib/contact';
+
+const year = new Date().getFullYear();
+const legalLine = [site.legalName, site.cnpj && `CNPJ ${site.cnpj}`, site.city].filter(Boolean).join(' · ');
+---
+
+<footer class="footer theme-dark">
+  <div class="container footer__inner">
+    <div class="footer__top">
+      <div class="footer__brand">
+        <Logo size={34} />
+        <p class="footer__tagline">Sistemas sob medida e soluções prontas.</p>
+      </div>
+
+      <nav class="footer__nav" aria-label="Rodapé">
+        <div class="footer__col">
+          <p class="label">Norma</p>
+          <ul role="list">
+            {mainNav.slice(0, 3).map((item) => (
+              <li>
+                <a href={item.href}>{item.label}</a>
+              </li>
+            ))}
+          </ul>
+        </div>
+        <div class="footer__col">
+          <p class="label">Soluções</p>
+          <ul role="list">
+            {productLinks.map((item) => (
+              <li>
+                <a href={item.href}>{item.label}</a>
+              </li>
+            ))}
+          </ul>
+        </div>
+        <div class="footer__col">
+          <p class="label">Contato</p>
+          <ul role="list">
+            <li>
+              <a href="/#contato">Pedir uma medição</a>
+            </li>
+            {site.whatsapp && (
+              <li>
+                <a
+                  href={whatsappUrl(site.whatsapp)}
+                  target="_blank"
+                  rel="noopener"
+                  data-track-location="rodape"
+                >
+                  WhatsApp
+                </a>
+              </li>
+            )}
+            {site.email && (
+              <li>
+                <a href={`mailto:${site.email}`} data-track-location="rodape">
+                  {site.email}
+                </a>
+              </li>
+            )}
+          </ul>
+        </div>
+      </nav>
+    </div>
+
+    <div class="footer__legal">
+      <span>{legalLine}</span>
+      <span class="footer__legal-links">
+        <a href="/privacidade">Política de privacidade</a>
+        <span>© {year} Norma</span>
+      </span>
+    </div>
+  </div>
+</footer>
+
+<style>
+  .footer {
+    border-top: 1px solid var(--line);
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+
+  .footer__inner {
+    display: flex;
+    flex-direction: column;
+    gap: 3rem;
+    padding-block: 4rem 2.5rem;
+  }
+
+  .footer__top {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 2.5rem;
+  }
+
+  .footer__brand {
+    display: flex;
+    flex-direction: column;
+    gap: 0.875rem;
+  }
+
+  .footer__tagline {
+    color: var(--fg-mute);
+    font-size: 0.9375rem;
+  }
+
+  .footer__nav {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 2.5rem 3.5rem;
+  }
+
+  .footer__col {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .footer__col ul {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+  }
+
+  .footer__col a {
+    display: inline-flex;
+    align-items: center;
+    min-height: 2.25rem;
+    color: #e2e2dc;
+    text-decoration: none;
+    font-size: 0.9375rem;
+  }
+
+  .footer__col a:hover {
+    color: var(--c-ruler);
+  }
+
+  .footer__legal {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 0.75rem 1.5rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--line);
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    color: var(--label);
+  }
+
+  .footer__legal-links {
+    display: flex;
+    gap: 1.5rem;
+  }
+
+  .footer__legal a {
+    color: inherit;
+  }
+
+  .footer__legal a:hover {
+    color: var(--c-ruler);
+  }
+</style>

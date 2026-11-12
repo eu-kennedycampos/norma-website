@@ -1,0 +1,250 @@
+---
+import Logo from '~/components/brand/Logo.astro';
+import Button from '~/components/ui/Button.astro';
+import { mainNav } from '~/config/site';
+
+interface Props {
+  cta: { label: string; href: string };
+}
+
+const { cta } = Astro.props;
+---
+
+<header class="header" data-header data-menu="closed">
+  <div class="header__bar container">
+    <a href="/" class="header__brand" aria-label="Norma — página inicial">
+      <Logo size={26} />
+    </a>
+
+    <nav class="header__nav" aria-label="Principal" id="menu-principal" data-nav-panel>
+      <ul role="list" class="header__links">
+        {mainNav.map((item) => (
+          <li>
+            <a href={item.href} class="header__link">
+              {item.label}
+            </a>
+          </li>
+        ))}
+      </ul>
+      <Button href={cta.href} class="header__cta-mobile" size="lg" track="menu" trackLocation="menu">
+        {cta.label}
+      </Button>
+    </nav>
+
+    <div class="header__actions">
+      <Button href={cta.href} class="header__cta" track="cabecalho" trackLocation="cabecalho">
+        {cta.label}
+      </Button>
+      <button
+        type="button"
+        class="header__toggle"
+        aria-controls="menu-principal"
+        aria-expanded="false"
+        aria-label="Abrir menu"
+        data-nav-toggle
+      >
+        <span class="header__toggle-lines" aria-hidden="true"></span>
+      </button>
+    </div>
+  </div>
+  <span class="header__progress" aria-hidden="true"></span>
+</header>
+
+<style>
+  .header {
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    border-bottom: 1px solid var(--c-line-dark);
+    color: var(--c-paper);
+  }
+
+  /* O desfoque fica num pseudo-elemento: `backdrop-filter` no próprio cabeçalho viraria
+     o bloco de referência do menu fixo do celular e o espremeria dentro da barra. */
+  .header::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    background: color-mix(in srgb, var(--c-ink) 92%, transparent);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+  }
+
+  .header__bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1.5rem;
+    min-height: var(--header-h);
+  }
+
+  .header__brand {
+    display: inline-flex;
+    text-decoration: none;
+    min-height: 2.75rem;
+    align-items: center;
+  }
+
+  .header__links {
+    display: flex;
+    gap: 2rem;
+  }
+
+  .header__link {
+    display: inline-flex;
+    align-items: center;
+    min-height: 2.75rem;
+    font-size: 0.9375rem;
+    color: var(--c-text-dark-dim);
+    text-decoration: none;
+    background: linear-gradient(var(--c-ruler), var(--c-ruler)) no-repeat left bottom 0.5rem / 0 2px;
+    transition:
+      color 0.2s ease,
+      background-size 0.35s var(--ease-tool);
+  }
+
+  .header__link:hover {
+    color: var(--c-paper);
+    background-size: 100% 2px;
+  }
+
+  .header__actions {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+  }
+
+  :global(.header__cta-mobile) {
+    display: none !important;
+  }
+
+  .header__toggle {
+    display: none;
+    width: 2.75rem;
+    height: 2.75rem;
+    padding: 0;
+    border: 1px solid var(--c-line-dark-2);
+    background: transparent;
+    cursor: pointer;
+    place-items: center;
+  }
+
+  /* Duas barras que viram um esquadro quando o menu abre. */
+  .header__toggle-lines,
+  .header__toggle-lines::after {
+    display: block;
+    width: 1.125rem;
+    height: 2px;
+    background: var(--c-paper);
+    transition: transform 0.35s var(--ease-tool);
+  }
+
+  .header__toggle-lines {
+    position: relative;
+  }
+
+  .header__toggle-lines::after {
+    content: '';
+    position: absolute;
+    top: 6px;
+    left: 0;
+  }
+
+  [data-menu='open'] .header__toggle-lines {
+    transform: translateY(-3px);
+  }
+
+  [data-menu='open'] .header__toggle-lines::after {
+    width: 0.625rem;
+    transform: translate(0.5rem, 1px) rotate(90deg);
+    transform-origin: right top;
+  }
+
+  /* Régua de leitura: avança conforme a página rola (só onde o navegador sabe animar pela rolagem). */
+  .header__progress {
+    position: absolute;
+    left: 0;
+    bottom: -1px;
+    height: 2px;
+    width: 100%;
+    background: var(--c-ruler);
+    transform-origin: left;
+    transform: scaleX(0);
+  }
+
+  @supports (animation-timeline: scroll()) {
+    .header__progress {
+      animation: progress linear both;
+      animation-timeline: scroll(root block);
+    }
+
+    @keyframes progress {
+      to {
+        transform: scaleX(1);
+      }
+    }
+  }
+
+  @media (max-width: 59.99rem) {
+    .header__toggle {
+      display: grid;
+    }
+
+    .header__nav {
+      position: fixed;
+      inset: var(--header-h) 0 0 0;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      gap: 2rem;
+      padding: 2rem var(--gutter) calc(2rem + env(safe-area-inset-bottom));
+      background: var(--c-ink);
+      opacity: 0;
+      visibility: hidden;
+      transform: translateY(-0.75rem);
+      transition:
+        opacity 0.3s ease,
+        transform 0.4s var(--ease-tool),
+        visibility 0s linear 0.4s;
+    }
+
+    [data-menu='open'] .header__nav {
+      opacity: 1;
+      visibility: visible;
+      transform: none;
+      transition:
+        opacity 0.3s ease,
+        transform 0.4s var(--ease-tool);
+    }
+
+    .header__links {
+      flex-direction: column;
+      gap: 0;
+    }
+
+    .header__links li {
+      border-bottom: 1px solid var(--c-line-dark);
+    }
+
+    .header__link {
+      width: 100%;
+      min-height: 4rem;
+      font-size: 1.75rem;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      color: var(--c-paper);
+      background: none;
+    }
+
+    :global(.header__cta-mobile) {
+      display: inline-flex !important;
+    }
+  }
+
+  @media (max-width: 30rem) {
+    :global(.header__cta) {
+      display: none !important;
+    }
+  }
+</style>

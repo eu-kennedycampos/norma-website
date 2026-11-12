@@ -1,0 +1,177 @@
+---
+/**
+ * Política de privacidade do site (LGPD). Descreve só o que este site realmente coleta.
+ * Revisar com o jurídico antes de publicar e sempre que o site passar a coletar algo novo.
+ */
+import { site } from '~/config/site';
+import BaseLayout from '~/layouts/BaseLayout.astro';
+
+const updatedAt = '12 de novembro de 2026';
+const controller = [site.legalName, site.cnpj && `CNPJ ${site.cnpj}`, site.city].filter(Boolean).join(', ');
+---
+
+<BaseLayout
+  title="Política de privacidade"
+  description="Como a Norma Tecnologia trata os dados de quem visita o site e pede contato."
+>
+  <article class="policy theme-light">
+    <div class="container policy__inner">
+      <header class="policy__header">
+        <p class="label">Atualizada em {updatedAt}</p>
+        <h1 class="policy__title">Política de privacidade</h1>
+        <p class="policy__lead">
+          O que coletamos neste site, para quê, e como você pode pedir para ver, corrigir ou apagar os seus
+          dados.
+        </p>
+      </header>
+
+      <section>
+        <h2>Quem é o controlador</h2>
+        <p>
+          {controller} é a responsável pelo tratamento dos dados pessoais coletados neste site, nos termos da
+          Lei Geral de Proteção de Dados (Lei 13.709/2018).
+        </p>
+      </section>
+
+      <section>
+        <h2>O que coletamos</h2>
+        <ul>
+          <li>
+            <strong>O que você escreve no formulário:</strong> nome, empresa, WhatsApp ou e-mail, o tamanho da
+            equipe (quando perguntado) e a mensagem.
+          </li>
+          <li>
+            <strong>De onde veio a visita:</strong> a página de entrada, o site que trouxe você até aqui e os
+            parâmetros de campanha do link (como <span class="mono">utm_source</span> e o identificador de
+            clique de anúncio). Ficam guardados no seu navegador por até 90 dias e só chegam até nós junto com
+            o formulário.
+          </li>
+          <li>
+            <strong>Medição de uso e de anúncios:</strong> com a sua permissão no aviso de cookies, usamos
+            ferramentas do Google (Tag Manager, Analytics e Ads) para contar visitas e conversões. Sem a
+            permissão, esses cookies não são gravados.
+          </li>
+        </ul>
+      </section>
+
+      <section>
+        <h2>Para que usamos</h2>
+        <ul>
+          <li>Responder ao seu contato e preparar uma proposta, quando você pede uma.</li>
+          <li>Avisar sobre o lançamento de um produto, quando você entra na lista de espera.</li>
+          <li>Entender quais páginas e campanhas funcionam, para melhorar o site e os anúncios.</li>
+        </ul>
+        <p>
+          As bases legais são o seu consentimento (cookies de medição e lista de espera) e os procedimentos
+          preliminares a um contrato que você pediu (resposta a um pedido de contato), conforme os artigos 7º,
+          I e V, da LGPD.
+        </p>
+      </section>
+
+      <section>
+        <h2>Com quem compartilhamos</h2>
+        <p>
+          Não vendemos dados. Eles passam apenas pelos fornecedores que fazem o site funcionar — hospedagem,
+          envio do formulário, WhatsApp e, com a sua permissão, as ferramentas de medição do Google —, cada um
+          limitado ao necessário para o seu serviço.
+        </p>
+      </section>
+
+      <section>
+        <h2>Por quanto tempo guardamos</h2>
+        <p>
+          Os dados de contato ficam guardados enquanto houver conversa ou relação comercial em andamento e são
+          apagados quando deixam de ser necessários, salvo obrigação legal de mantê-los.
+        </p>
+      </section>
+
+      <section>
+        <h2>Os seus direitos</h2>
+        <p>
+          Você pode, a qualquer momento, confirmar se tratamos dados seus, acessá-los, corrigi-los, pedir que
+          sejam apagados, revogar o consentimento e pedir informações sobre o compartilhamento (art. 18 da
+          LGPD).
+          {site.email ? (
+            <>
+              {' '}
+              Escreva para <a href={`mailto:${site.email}`}>{site.email}</a>.
+            </>
+          ) : (
+            ' Use o mesmo canal pelo qual entrou em contato com a gente.'
+          )}
+        </p>
+        <p>
+          Para mudar a escolha sobre cookies, limpe os dados deste site no seu navegador: o aviso aparece de
+          novo na próxima visita.
+        </p>
+      </section>
+    </div>
+  </article>
+</BaseLayout>
+
+<style>
+  .policy__inner {
+    display: flex;
+    flex-direction: column;
+    gap: 2.5rem;
+    max-width: 52rem;
+    margin-inline: 0;
+    padding-block: clamp(3rem, 8vw, 6rem);
+  }
+
+  @media (min-width: 60rem) {
+    .policy__inner {
+      margin-inline: auto;
+    }
+  }
+
+  .policy__header {
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+    padding-bottom: 2rem;
+    border-bottom: 1px solid var(--line-strong);
+  }
+
+  .policy__title {
+    font-size: var(--fs-h2);
+  }
+
+  .policy__lead {
+    font-size: var(--fs-lead);
+    color: var(--fg-dim);
+  }
+
+  .policy section {
+    display: flex;
+    flex-direction: column;
+    gap: 0.875rem;
+  }
+
+  .policy h2 {
+    font-size: 1.5rem;
+    letter-spacing: -0.02em;
+  }
+
+  .policy p,
+  .policy li {
+    font-size: 1.0625rem;
+    line-height: 1.7;
+    color: var(--fg-dim);
+  }
+
+  .policy ul {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    padding-left: 1.25rem;
+  }
+
+  .policy strong {
+    color: var(--fg);
+  }
+
+  .policy a {
+    text-underline-offset: 0.2em;
+  }
+</style>

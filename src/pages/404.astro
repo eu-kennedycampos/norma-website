@@ -1,0 +1,73 @@
+---
+import Button from '~/components/ui/Button.astro';
+import { productLinks } from '~/config/site';
+import BaseLayout from '~/layouts/BaseLayout.astro';
+---
+
+<BaseLayout
+  title="Página não encontrada"
+  description="O endereço que você abriu não existe mais ou nunca existiu."
+  noindex
+  bare
+>
+  <section class="missing theme-dark">
+    <div class="container missing__inner">
+      <p class="label">Erro 404</p>
+      <h1 class="missing__title">
+        Essa página não tem a <span>medida</span> certa.
+      </h1>
+      <p class="missing__text">
+        O endereço não existe mais ou foi digitado diferente. Daqui você chega aonde queria:
+      </p>
+      <div class="missing__actions">
+        <Button href="/">Página inicial</Button>
+        {productLinks.map((link) => (
+          <Button href={link.href} variant="outline">
+            {link.label}
+          </Button>
+        ))}
+      </div>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .missing__inner {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    min-height: calc(100dvh - var(--header-h) - 12rem);
+    justify-content: center;
+    padding-block: clamp(3rem, 8vw, 6rem);
+  }
+
+  .missing__title {
+    max-width: 16ch;
+    font-size: clamp(2.5rem, 7vw, 5.5rem);
+    line-height: 0.98;
+  }
+
+  .missing__title span {
+    color: var(--c-ruler);
+    font-stretch: 62%;
+    animation: squeeze 4s var(--ease-tool) infinite;
+  }
+
+  .missing__text {
+    max-width: 34rem;
+    font-size: var(--fs-lead);
+    color: var(--fg-dim);
+  }
+
+  .missing__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+  }
+
+  @keyframes squeeze {
+    50% {
+      font-stretch: 125%;
+    }
+  }
+</style>

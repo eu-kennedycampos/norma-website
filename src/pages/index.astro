@@ -1,0 +1,60 @@
+---
+import LeadSection from '~/components/forms/LeadSection.astro';
+import Difference from '~/components/home/Difference.astro';
+import Hero from '~/components/home/Hero.astro';
+import Problem from '~/components/home/Problem.astro';
+import Process from '~/components/home/Process.astro';
+import Solutions from '~/components/home/Solutions.astro';
+import Faq from '~/components/ui/Faq.astro';
+import RulerBand from '~/components/ui/RulerBand.astro';
+import SectionHeader from '~/components/ui/SectionHeader.astro';
+import { site } from '~/config/site';
+import { homeFaq } from '~/data/home';
+import BaseLayout from '~/layouts/BaseLayout.astro';
+import { customSoftwareService, faqPage } from '~/lib/schema';
+
+const base = Astro.site ?? new URL(Astro.url.origin);
+---
+
+<BaseLayout
+  title={`${site.defaultTitle} | Norma Tecnologia`}
+  description={site.defaultDescription}
+  schema={[customSoftwareService(base), faqPage(base, '/', homeFaq)]}
+>
+  <Hero />
+  <RulerBand />
+  <Problem />
+  <Difference />
+  <Process />
+  <Solutions />
+
+  <section id="perguntas" class="section theme-light" aria-labelledby="perguntas-titulo">
+    <div class="container faq-section">
+      <SectionHeader
+        index="05"
+        label="Perguntas"
+        title="O que costumam perguntar antes de começar."
+        titleId="perguntas-titulo"
+      />
+      <Faq items={homeFaq} />
+    </div>
+  </section>
+
+  <LeadSection
+    id="contato"
+    label="06 — Medição"
+    title="Qual parte da sua empresa ainda roda em planilha?"
+    text="Conte em poucas linhas. A resposta vem de quem vai construir — com perguntas sobre o seu processo, não com uma apresentação pronta."
+    formId="form-medicao"
+    interest="sob-medida"
+    submitLabel="Pedir a medição"
+  />
+</BaseLayout>
+
+<style>
+  .faq-section {
+    display: flex;
+    flex-direction: column;
+    gap: clamp(2.5rem, 5vw, 3rem);
+  }
+</style>

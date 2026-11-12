@@ -1,0 +1,293 @@
+---
+/**
+ * Página de produto pronto (Ponto, Assinatura). Pensada como página de destino de anúncio:
+ * a mesma promessa do anúncio no título, a ação acima da dobra e a lista de espera no fim.
+ * A ilustração do produto entra pelo slot.
+ */
+import Logo from '~/components/brand/Logo.astro';
+import LeadSection from '~/components/forms/LeadSection.astro';
+import Button from '~/components/ui/Button.astro';
+import Faq from '~/components/ui/Faq.astro';
+import SectionHeader from '~/components/ui/SectionHeader.astro';
+import { site } from '~/config/site';
+import type { ProductPage } from '~/data/types';
+import { breadcrumbs, faqPage, softwareApplication } from '~/lib/schema';
+import BaseLayout from './BaseLayout.astro';
+
+interface Props {
+  page: ProductPage;
+}
+
+const { page } = Astro.props;
+const base = Astro.site ?? new URL(Astro.url.origin);
+const waitlistHref = '#lista';
+const schema = [
+  softwareApplication(base, {
+    name: page.name,
+    path: page.path,
+    description: page.seo.description,
+    category: page.schema.category,
+    os: page.schema.os,
+  }),
+  faqPage(base, page.path, page.faq),
+  breadcrumbs(base, [
+    { name: 'Norma', path: '/' },
+    { name: page.name, path: page.path },
+  ]),
+];
+---
+
+<BaseLayout
+  title={page.seo.title}
+  description={page.seo.description}
+  image={page.seo.image}
+  cta={{ label: 'Entrar na lista', href: waitlistHref }}
+  schema={schema}
+>
+  <section class="product-hero theme-dark" aria-labelledby="produto-titulo">
+    <div class="container product-hero__inner">
+      <div class="product-hero__copy">
+        <nav class="product-hero__crumbs label" aria-label="Você está em">
+          <a href="/">Norma</a>
+          <span aria-hidden="true">/</span>
+          <span aria-current="page">{page.name}</span>
+        </nav>
+        <div class="product-hero__brand">
+          <Logo size={30} product={page.product} dot={page.dot} />
+          <span class="product-hero__status">{site.launchLabel}</span>
+        </div>
+        <h1 id="produto-titulo" class="product-hero__title">
+          {page.hero.title}
+        </h1>
+        <p class="product-hero__lead">{page.hero.lead}</p>
+        <div class="product-hero__actions" data-cta-zone>
+          <Button href={waitlistHref} size="lg" track="lista-de-espera" trackLocation="topo">
+            Entrar na lista de espera
+          </Button>
+          <Button href="#recursos" variant="outline" size="lg" track="ver-recursos" trackLocation="topo">
+            Ver o que vem incluso
+          </Button>
+        </div>
+      </div>
+      <div class="product-hero__visual">
+        <slot name="visual" />
+      </div>
+    </div>
+  </section>
+
+  <section id="recursos" class="section theme-light" aria-labelledby="recursos-titulo">
+    <div class="container product-section">
+      <SectionHeader
+        label="O que vem no produto"
+        title={page.features.title}
+        titleId="recursos-titulo"
+        lead={page.features.lead}
+      />
+      <ul role="list" class="features">
+        {page.features.items.map((feature, index) => (
+          <li class="feature" data-reveal style={`--reveal-delay: ${(index % 3) * 80}ms`}>
+            <span class="label">{String(index + 1).padStart(2, '0')}</span>
+            <h3 class="feature__title">{feature.title}</h3>
+            <p class="feature__text">{feature.text}</p>
+          </li>
+        ))}
+      </ul>
+    </div>
+  </section>
+
+  <section class="section theme-dark" aria-labelledby="incluso-titulo">
+    <div class="container included" data-reveal>
+      <div class="included__copy">
+        <p class="label">Preço sem surpresa</p>
+        <h2 id="incluso-titulo" class="included__title">
+          {page.included.title}
+        </h2>
+        <p class="included__text">{page.included.text}</p>
+      </div>
+      <ul role="list" class="included__points">
+        {page.included.points.map((point) => (
+          <li>
+            <span aria-hidden="true">¬</span>
+            {point}
+          </li>
+        ))}
+      </ul>
+    </div>
+  </section>
+
+  <section class="section theme-light" aria-labelledby="produto-perguntas">
+    <div class="container product-section">
+      <SectionHeader label="Perguntas" title={`Sobre o ${page.name}.`} titleId="produto-perguntas" />
+      <Faq items={page.faq} />
+    </div>
+  </section>
+
+  <LeadSection
+    id="lista"
+    label="Lista de espera"
+    title={page.waitlist.title}
+    text={page.waitlist.text}
+    formId={`form-${page.product}`}
+    interest={page.interest}
+    submitLabel="Entrar na lista de espera"
+    askTeamSize={page.interest === 'ponto'}
+    askMessage={false}
+  />
+</BaseLayout>
+
+<style>
+  .product-hero__inner {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(30rem, 100%), 1fr));
+    gap: clamp(2.5rem, 6vw, 4rem);
+    align-items: center;
+    padding-block: clamp(2.5rem, 6vw, 5rem);
+  }
+
+  .product-hero__copy {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    min-width: 0;
+  }
+
+  .product-hero__crumbs {
+    display: flex;
+    gap: 0.625rem;
+    text-transform: none;
+    letter-spacing: 0.02em;
+  }
+
+  .product-hero__crumbs a {
+    color: inherit;
+    text-decoration: none;
+  }
+
+  .product-hero__crumbs a:hover {
+    color: var(--c-ruler);
+  }
+
+  .product-hero__brand {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 1rem;
+  }
+
+  .product-hero__status {
+    padding: 0.375rem 0.5625rem;
+    border: 1px solid var(--line-strong);
+    font-family: var(--font-mono);
+    font-size: 0.6875rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--fg-dim);
+  }
+
+  .product-hero__title {
+    font-size: clamp(2.5rem, 5.6vw, 4.75rem);
+    line-height: 0.98;
+    letter-spacing: -0.035em;
+  }
+
+  .product-hero__lead {
+    max-width: 36rem;
+    font-size: var(--fs-lead);
+    line-height: 1.6;
+    color: var(--fg-dim);
+  }
+
+  .product-hero__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.875rem;
+  }
+
+  .product-hero__visual {
+    min-width: 0;
+  }
+
+  .product-section {
+    display: flex;
+    flex-direction: column;
+    gap: clamp(2.5rem, 5vw, 3.5rem);
+  }
+
+  .features {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(18rem, 100%), 1fr));
+    gap: 1px;
+    background: var(--line);
+    border: 1px solid var(--line);
+  }
+
+  .feature {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    padding: clamp(1.25rem, 3vw, 2rem);
+    background: var(--bg);
+    transition: background-color 0.3s ease;
+  }
+
+  .feature:hover {
+    background: var(--bg-raised);
+  }
+
+  .feature__title {
+    font-size: var(--fs-h3);
+    letter-spacing: -0.015em;
+    line-height: 1.2;
+  }
+
+  .feature__text {
+    color: var(--fg-dim);
+    line-height: 1.55;
+  }
+
+  .included {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(26rem, 100%), 1fr));
+    gap: 2.5rem;
+    align-items: center;
+  }
+
+  .included__copy {
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+  }
+
+  .included__title {
+    font-size: var(--fs-h2);
+  }
+
+  .included__text {
+    max-width: 34rem;
+    font-size: var(--fs-lead);
+    line-height: 1.6;
+    color: var(--fg-dim);
+  }
+
+  .included__points {
+    display: grid;
+    gap: 1px;
+    background: var(--line);
+    border: 1px solid var(--line);
+  }
+
+  .included__points li {
+    display: flex;
+    gap: 1rem;
+    align-items: baseline;
+    padding: 1.25rem 1.5rem;
+    background: var(--bg);
+    font-size: 1.125rem;
+    font-weight: 600;
+  }
+
+  .included__points span {
+    color: var(--c-ruler);
+    font-weight: 800;
+  }
+</style>

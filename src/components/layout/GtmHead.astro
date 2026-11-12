@@ -1,0 +1,52 @@
+---
+/**
+ * Google Tag Manager com Consent Mode v2. A ordem importa:
+ *  1. o padrão "negado" e a escolha já guardada entram ANTES do GTM;
+ *  2. o GTM carrega depois, já sabendo o que pode gravar.
+ * Sem PUBLIC_GTM_ID este componente não imprime nada — nenhum script de terceiro.
+ */
+import { PUBLIC_GTM_ID } from 'astro:env/client';
+import { CONSENT_KEY } from '~/lib/consent';
+
+const gtmId = PUBLIC_GTM_ID?.trim();
+---
+
+{gtmId && (
+  <>
+    <script is:inline define:vars={{ consentKey: CONSENT_KEY }}>
+      window.dataLayer = window.dataLayer || [];
+      function gtag() {
+        window.dataLayer.push(arguments);
+      }
+      var granted = false;
+      try {
+        var stored = JSON.parse(window.localStorage.getItem(consentKey) || 'null');
+        granted = !!stored && stored.choice === 'granted';
+      } catch (e) {}
+      var state = granted ? 'granted' : 'denied';
+      gtag('consent', 'default', {
+        ad_storage: state,
+        ad_user_data: state,
+        ad_personalization: state,
+        analytics_storage: state,
+        functionality_storage: 'granted',
+        security_storage: 'granted',
+        wait_for_update: 500,
+      });
+      gtag('set', 'ads_data_redaction', true);
+      gtag('set', 'url_passthrough', true);
+    </script>
+    <script is:inline define:vars={{ gtmId }}>
+      (function (w, d, s, l, i) {
+        w[l] = w[l] || [];
+        w[l].push({ 'gtm.start': new Date().getTime(), event: 'gtm.js' });
+        var f = d.getElementsByTagName(s)[0],
+          j = d.createElement(s),
+          dl = l != 'dataLayer' ? '&l=' + l : '';
+        j.async = true;
+        j.src = 'https://www.googletagmanager.com/gtm.js?id=' + i + dl;
+        f.parentNode.insertBefore(j, f);
+      })(window, document, 'script', 'dataLayer', gtmId);
+    </script>
+  </>
+)}

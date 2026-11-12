@@ -1,0 +1,115 @@
+---
+import '@fontsource-variable/archivo/wdth.css';
+import '@fontsource-variable/martian-mono/wght.css';
+import '~/styles/global.css';
+import archivoLatin from '@fontsource-variable/archivo/files/archivo-latin-wdth-normal.woff2?url';
+import { PUBLIC_GTM_ID } from 'astro:env/client';
+
+import ConsentBanner from '~/components/layout/ConsentBanner.astro';
+import Footer from '~/components/layout/Footer.astro';
+import GtmHead from '~/components/layout/GtmHead.astro';
+import Header from '~/components/layout/Header.astro';
+import MobileCta from '~/components/layout/MobileCta.astro';
+import JsonLd from '~/components/seo/JsonLd.astro';
+import Seo, { type SeoProps } from '~/components/seo/Seo.astro';
+import { site } from '~/config/site';
+import { organization, website } from '~/lib/schema';
+
+interface Props extends SeoProps {
+  /** Ação principal da página: vai para o cabeçalho e para a barra do celular. */
+  cta?: { label: string; href: string };
+  /** Nós extras de schema.org; a organização e o site entram sempre. */
+  schema?: Record<string, unknown>[];
+  /** Páginas mínimas (obrigado, 404) dispensam a barra de ação do celular. */
+  bare?: boolean;
+}
+
+const {
+  cta = { label: 'Pedir uma medição', href: '/#contato' },
+  schema = [],
+  bare = false,
+  ...seo
+} = Astro.props;
+
+const base = Astro.site ?? new URL(Astro.url.origin);
+const gtmId = PUBLIC_GTM_ID?.trim();
+---
+
+<!doctype html>
+<html lang={site.lang} data-gtm={gtmId ? 'on' : 'off'}>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <script is:inline>
+      document.documentElement.classList.add('js');
+    </script>
+    <GtmHead />
+    <Seo {...seo} />
+    <meta name="theme-color" content={site.themeColor} />
+    <meta name="color-scheme" content="dark light" />
+    <link rel="preload" href={archivoLatin} as="font" type="font/woff2" crossorigin />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="icon" href="/favicon.ico" sizes="32x32" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <link rel="manifest" href="/site.webmanifest" />
+    <link rel="sitemap" href="/sitemap-index.xml" />
+    <JsonLd data={[organization(base), website(base), ...schema]} />
+  </head>
+  <body>
+    {gtmId && (
+      <noscript>
+        <iframe
+          src={`https://www.googletagmanager.com/ns.html?id=${gtmId}`}
+          height="0"
+          width="0"
+          style="display:none;visibility:hidden"
+          title="Google Tag Manager"
+        />
+      </noscript>
+    )}
+    <a href="#conteudo" class="skip-link">
+      Pular para o conteúdo
+    </a>
+    <Header cta={cta} />
+    <main id="conteudo" tabindex="-1">
+      <slot />
+    </main>
+    <Footer />
+    {!bare && <MobileCta cta={cta} />}
+    <ConsentBanner />
+  </body>
+</html>
+
+<script>
+  import '~/scripts/site.ts';
+</script>
+
+<style>
+  .skip-link {
+    position: absolute;
+    left: 1rem;
+    top: -4rem;
+    z-index: 100;
+    padding: 0.75rem 1rem;
+    background: var(--c-ruler);
+    color: var(--c-ink);
+    font-weight: 700;
+    text-decoration: none;
+    transition: top 0.2s ease;
+  }
+
+  .skip-link:focus {
+    top: 1rem;
+  }
+
+  main:focus {
+    outline: none;
+  }
+
+  /* Espaço para a barra fixa do celular não cobrir o fim do rodapé. */
+  @media (max-width: 47.99rem) {
+    body {
+      padding-bottom: calc(5rem + env(safe-area-inset-bottom));
+    }
+  }
+</style>

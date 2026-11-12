@@ -1,0 +1,157 @@
+---
+import SectionHeader from '~/components/ui/SectionHeader.astro';
+import { comparison } from '~/data/home';
+---
+
+<section id="diferencial" class="section theme-dark" aria-labelledby="diferencial-titulo">
+  <div class="container difference">
+    <SectionHeader
+      index="02"
+      label="O diferencial"
+      title="Quem se adapta é o sistema. Não a sua equipe."
+      titleId="diferencial-titulo"
+      lead="Não vendemos um software pronto com outro nome. Cada sistema começa do zero no que importa — as regras, o fluxo, as exceções da sua operação — e reaproveita uma base testada no que é igual para todo mundo: acesso, permissões, fiscal, assinatura, integrações."
+    />
+
+    <div class="difference__table-wrap" data-reveal>
+      <table class="difference__table">
+        <caption class="visually-hidden">
+          Comparação entre um sistema de prateleira e um sistema Norma
+        </caption>
+        <thead>
+          <tr>
+            <td></td>
+            <th scope="col">Sistema de prateleira</th>
+            <th scope="col" class="difference__norma-head">
+              Norma
+            </th>
+          </tr>
+        </thead>
+        <tbody>
+          {comparison.map((row) => (
+            <tr>
+              <th scope="row">{row.criterion}</th>
+              <td data-label="Prateleira">{row.shelf}</td>
+              <td data-label="Norma" class="difference__norma">
+                {row.norma}
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<style>
+  .difference {
+    display: flex;
+    flex-direction: column;
+    gap: clamp(3rem, 6vw, 3.5rem);
+  }
+
+  .difference__table-wrap {
+    background: var(--c-paper);
+    color: var(--c-ink);
+    border: 1px solid var(--line);
+  }
+
+  .difference__table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 1.0625rem;
+    line-height: 1.45;
+  }
+
+  .difference__table th,
+  .difference__table td {
+    text-align: left;
+    vertical-align: top;
+    padding: 1.375rem 1.25rem;
+    border-top: 1px solid var(--c-line-light);
+  }
+
+  .difference__table thead th,
+  .difference__table thead td {
+    border-top: 0;
+    font-size: 1.25rem;
+    font-weight: 800;
+    color: var(--c-steel-dark);
+  }
+
+  .difference__table tbody th {
+    width: 24%;
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--c-text-light-dim);
+  }
+
+  .difference__table tbody td {
+    width: 38%;
+    color: var(--c-steel-dark);
+  }
+
+  .difference__table thead .difference__norma-head {
+    background: var(--c-ruler);
+    color: var(--c-ink);
+  }
+
+  .difference__table .difference__norma {
+    background: var(--c-ruler-soft);
+    color: var(--c-ink);
+    font-weight: 600;
+  }
+
+  /* No celular a tabela vira fichas: critério em cima, as duas respostas embaixo. */
+  @media (max-width: 44.99rem) {
+    .difference__table thead {
+      display: none;
+    }
+
+    .difference__table,
+    .difference__table tbody,
+    .difference__table tr,
+    .difference__table th,
+    .difference__table td {
+      display: block;
+      width: 100% !important;
+    }
+
+    .difference__table tr {
+      border-top: 1px solid var(--c-line-light);
+    }
+
+    .difference__table tr:first-child {
+      border-top: 0;
+    }
+
+    .difference__table th,
+    .difference__table td {
+      border-top: 0;
+      padding: 0.75rem 1.125rem;
+    }
+
+    .difference__table tbody th {
+      padding-top: 1.25rem;
+    }
+
+    .difference__table tbody td::before {
+      content: attr(data-label);
+      display: block;
+      margin-bottom: 0.25rem;
+      font-family: var(--font-mono);
+      font-size: 0.6875rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--c-steel-dark);
+      font-weight: 500;
+    }
+
+    .difference__table .difference__norma {
+      margin-bottom: 1.125rem;
+    }
+  }
+</style>

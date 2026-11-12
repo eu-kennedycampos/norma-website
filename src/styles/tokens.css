@@ -1,0 +1,106 @@
+/*
+ * Tokens da marca. A paleta vem do metro articulado do marceneiro: o amarelo da régua,
+ * o grafite das marcas e o vermelho que aparece a cada 10 cm (só em cotas, nunca em texto).
+ */
+:root {
+  /* Cor */
+  --c-ink: #111110;
+  --c-ink-2: #161614;
+  --c-ink-3: #0b0b0a;
+  --c-paper: #f3f3ef;
+  --c-paper-2: #ecece6;
+  --c-ruler: #f2c200;
+  --c-ruler-hover: #ffe27a;
+  --c-ruler-soft: #f7e9a8;
+  --c-ruler-field: #f7da55;
+  --c-mark: #d9381e;
+  --c-steel: #8c8c86;
+  --c-steel-dark: #5c5c57;
+  --c-line-dark: #2b2b28;
+  --c-line-dark-2: #3a3a36;
+  --c-line-light: #d6d6d0;
+  --c-text-dark-dim: #c9c9c2;
+  --c-text-dark-mute: #a3a39c;
+  --c-text-light-dim: #3a3a36;
+
+  /* Tipo */
+  --font-sans: 'Archivo Variable', 'Helvetica Neue', Arial, sans-serif;
+  --font-mono: 'Martian Mono Variable', ui-monospace, 'SFMono-Regular', Menlo, monospace;
+  --fs-display: clamp(2.75rem, 8.4vw, 8.25rem);
+  --fs-h2: clamp(2.25rem, 4.6vw, 4rem);
+  --fs-h3: clamp(1.25rem, 1.6vw, 1.5rem);
+  --fs-lead: clamp(1.0625rem, 1.3vw, 1.1875rem);
+  --fs-body: 1rem;
+  --fs-label: 0.75rem;
+
+  /* Espaço */
+  --container: 82.5rem;
+  --gutter: clamp(1rem, 3vw, 1.5rem);
+  --section-y: clamp(4.5rem, 10vw, 7rem);
+  --header-h: 4.5rem;
+
+  /* Movimento: o esquadro acelera, risca e para seco */
+  --ease-tool: cubic-bezier(0.7, 0, 0.2, 1);
+  --ease-snap: cubic-bezier(0.3, 1.7, 0.5, 1);
+  --ease-out: cubic-bezier(0.2, 0.7, 0.2, 1);
+}
+
+/*
+ * Temas de seção. Os componentes leem só as variáveis semânticas (--bg, --fg, --line…),
+ * então o mesmo componente funciona sobre grafite, papel ou amarelo.
+ */
+.theme-dark {
+  --bg: var(--c-ink);
+  --bg-raised: var(--c-ink-2);
+  --fg: var(--c-paper);
+  --fg-dim: var(--c-text-dark-dim);
+  --fg-mute: var(--c-text-dark-mute);
+  --label: var(--c-steel);
+  --line: var(--c-line-dark);
+  --line-strong: var(--c-line-dark-2);
+  --accent: var(--c-ruler);
+  background: var(--bg);
+  color: var(--fg);
+}
+
+.theme-darker {
+  --bg: var(--c-ink-3);
+  --bg-raised: var(--c-ink);
+  --fg: var(--c-paper);
+  --fg-dim: var(--c-text-dark-dim);
+  --fg-mute: var(--c-text-dark-mute);
+  --label: var(--c-steel);
+  --line: var(--c-line-dark);
+  --line-strong: var(--c-line-dark-2);
+  --accent: var(--c-ruler);
+  background: var(--bg);
+  color: var(--fg);
+}
+
+.theme-light {
+  --bg: var(--c-paper);
+  --bg-raised: var(--c-paper-2);
+  --fg: var(--c-ink);
+  --fg-dim: var(--c-text-light-dim);
+  --fg-mute: var(--c-steel-dark);
+  --label: var(--c-steel-dark);
+  --line: var(--c-line-light);
+  --line-strong: var(--c-ink);
+  --accent: var(--c-ink);
+  background: var(--bg);
+  color: var(--fg);
+}
+
+.theme-ruler {
+  --bg: var(--c-ruler);
+  --bg-raised: var(--c-ruler-field);
+  --fg: var(--c-ink);
+  --fg-dim: var(--c-ink);
+  --fg-mute: #3d3510;
+  --label: var(--c-ink);
+  --line: var(--c-ink);
+  --line-strong: var(--c-ink);
+  --accent: var(--c-ink);
+  background: var(--bg);
+  color: var(--fg);
+}

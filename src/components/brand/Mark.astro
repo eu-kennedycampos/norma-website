@@ -1,0 +1,86 @@
+---
+/**
+ * O esquadro (¬). Grade de módulo m = 16: braço de 5m, queda de 3m, ponto de 1m a ¼m das barras.
+ * O ponto é o cliente — a peça que o esquadro existe para medir — e muda de cor por produto.
+ */
+interface Props {
+  size?: number;
+  bar?: string;
+  dot?: string;
+  /** Sem o ponto: para tamanhos abaixo de 24 px, onde ele vira ruído. */
+  dotless?: boolean;
+  /** Anima a construção: risca o braço, desce a queda, encaixa o ponto. */
+  animated?: boolean;
+  class?: string;
+  label?: string;
+}
+
+const {
+  size = 40,
+  bar = 'currentColor',
+  dot = 'var(--c-ruler)',
+  dotless = false,
+  animated = false,
+  class: className,
+  label,
+} = Astro.props;
+const height = Math.round((size * 48) / 80);
+---
+
+<svg
+  class:list={['symbol', { 'symbol--animated': animated }, className]}
+  width={size}
+  height={height}
+  viewBox="10 28 80 48"
+  role={label ? 'img' : undefined}
+  aria-label={label}
+  aria-hidden={label ? undefined : 'true'}
+>
+  <rect class="symbol__arm" x="10" y="28" width="80" height="16" style={`fill: ${bar}`}></rect>
+  <rect class="symbol__drop" x="74" y="28" width="16" height="48" style={`fill: ${bar}`}></rect>
+  {!dotless && <rect class="symbol__dot" x="54" y="48" width="16" height="16" style={`fill: ${dot}`}></rect>}
+</svg>
+
+<style>
+  .symbol {
+    flex: none;
+    overflow: visible;
+  }
+
+  .symbol--animated rect {
+    transform-box: fill-box;
+  }
+
+  .symbol--animated .symbol__arm {
+    transform-origin: left center;
+    animation: arm 0.9s var(--ease-tool) 0.15s both;
+  }
+
+  .symbol--animated .symbol__drop {
+    transform-origin: center top;
+    animation: drop 0.7s var(--ease-tool) 0.9s both;
+  }
+
+  .symbol--animated .symbol__dot {
+    transform-origin: center;
+    animation: dot 0.6s var(--ease-snap) 1.5s both;
+  }
+
+  @keyframes arm {
+    from {
+      transform: scaleX(0);
+    }
+  }
+
+  @keyframes drop {
+    from {
+      transform: scaleY(0);
+    }
+  }
+
+  @keyframes dot {
+    from {
+      transform: scale(0);
+    }
+  }
+</style>

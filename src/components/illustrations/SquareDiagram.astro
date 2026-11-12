@@ -1,0 +1,104 @@
+---
+/** O esquadro grande do topo, com as cotas da grade de construção. Desenha-se ao carregar. */
+interface Props {
+  class?: string;
+}
+
+const { class: className } = Astro.props;
+---
+
+<svg
+  class:list={['diagram', className]}
+  viewBox="-14 -14 128 128"
+  role="img"
+  aria-label="O esquadro da Norma com cotas de medida"
+>
+  <g class="diagram__dims diagram__lines" stroke-width="0.4" fill="none">
+    <line x1="10" y1="16" x2="90" y2="16"></line>
+    <line x1="10" y1="13" x2="10" y2="19"></line>
+    <line x1="90" y1="13" x2="90" y2="19"></line>
+    <line x1="100" y1="28" x2="100" y2="76"></line>
+    <line x1="97" y1="28" x2="103" y2="28"></line>
+    <line x1="97" y1="76" x2="103" y2="76"></line>
+    <line x1="10" y1="44" x2="10" y2="96" stroke-dasharray="1.2 1.2"></line>
+    <line x1="10" y1="96" x2="90" y2="96" stroke-dasharray="1.2 1.2"></line>
+    <line x1="62" y1="56" x2="40" y2="84"></line>
+  </g>
+  <g class="diagram__dims diagram__labels" font-size="3.2">
+    <text x="50" y="12" text-anchor="middle">
+      5m
+    </text>
+    <text x="105" y="53">
+      3m
+    </text>
+    <text x="39" y="89" text-anchor="end">
+      sua empresa
+    </text>
+  </g>
+  <rect class="diagram__arm" x="10" y="28" width="80" height="16"></rect>
+  <rect class="diagram__drop" x="74" y="28" width="16" height="48"></rect>
+  <rect class="diagram__dot" x="54" y="48" width="16" height="16"></rect>
+</svg>
+
+<style>
+  .diagram rect {
+    transform-box: fill-box;
+    fill: var(--c-paper);
+  }
+
+  .diagram .diagram__dot {
+    fill: var(--c-ruler);
+  }
+
+  .diagram__lines {
+    stroke: var(--c-steel-dark);
+  }
+
+  .diagram__labels {
+    fill: var(--c-steel);
+    font-family: var(--font-mono);
+  }
+
+  .diagram__arm {
+    transform-origin: left center;
+    animation: arm 0.9s var(--ease-tool) 0.5s both;
+  }
+
+  .diagram__drop {
+    transform-origin: center top;
+    animation: drop 0.7s var(--ease-tool) 1.25s both;
+  }
+
+  .diagram__dot {
+    transform-origin: center;
+    animation: dot 0.6s var(--ease-snap) 1.85s both;
+  }
+
+  .diagram__dims {
+    animation: fade 0.6s ease 2.4s both;
+  }
+
+  @keyframes arm {
+    from {
+      transform: scaleX(0);
+    }
+  }
+
+  @keyframes drop {
+    from {
+      transform: scaleY(0);
+    }
+  }
+
+  @keyframes dot {
+    from {
+      transform: scale(0);
+    }
+  }
+
+  @keyframes fade {
+    from {
+      opacity: 0;
+    }
+  }
+</style>

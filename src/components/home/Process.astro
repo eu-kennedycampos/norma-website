@@ -1,0 +1,152 @@
+---
+import SectionHeader from '~/components/ui/SectionHeader.astro';
+import { processSteps } from '~/data/home';
+---
+
+<section id="implantacao" class="section theme-light" aria-labelledby="implantacao-titulo">
+  <div class="container process">
+    <SectionHeader
+      index="03"
+      label="O plano de implantação"
+      title="Medir antes de cortar. Em cinco etapas."
+      titleId="implantacao-titulo"
+      lead="Nenhuma linha de código antes de entender a sua empresa. Cada etapa termina com algo que você vê, aprova e usa — sem surpresa no fim do projeto."
+    />
+
+    <div class="process__body">
+      <div class="process__track" aria-hidden="true">
+        <span class="process__rail"></span>
+        <span class="process__piece"></span>
+      </div>
+
+      <ol role="list" class="process__steps">
+        {processSteps.map((step, index) => (
+          <li class="process__step" data-reveal style={`--reveal-delay: ${index * 90}ms`}>
+            <span class="label">{String(index + 1).padStart(2, '0')}</span>
+            <h3 class="process__verb">{step.verb}</h3>
+            <p class="process__text">{step.text}</p>
+            <p class="process__deliverable">
+              <span class="label">Você recebe</span>
+              <strong>{step.deliverable}</strong>
+            </p>
+          </li>
+        ))}
+      </ol>
+    </div>
+  </div>
+</section>
+
+<style>
+  .process {
+    display: flex;
+    flex-direction: column;
+    gap: clamp(3rem, 6vw, 4rem);
+  }
+
+  .process__body {
+    display: flex;
+    flex-direction: column;
+    gap: 1.75rem;
+  }
+
+  /* A peça amarela percorre as cinco etapas e para em cada uma. */
+  .process__track {
+    position: relative;
+    height: 1.125rem;
+    margin-right: 1.125rem;
+  }
+
+  .process__rail {
+    position: absolute;
+    left: 0;
+    right: -1.125rem;
+    top: 0.5rem;
+    height: 2px;
+    background: var(--c-ink);
+  }
+
+  .process__piece {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 1.125rem;
+    height: 1.125rem;
+    background: var(--c-ruler);
+    border: 2px solid var(--c-ink);
+    animation: travel 10s var(--ease-tool) infinite;
+  }
+
+  .process__steps {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(13.5rem, 100%), 1fr));
+    gap: 2rem 1.75rem;
+  }
+
+  .process__step {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .process__verb {
+    font-size: clamp(1.75rem, 2.6vw, 2.25rem);
+    font-stretch: 106%;
+  }
+
+  .process__text {
+    font-size: 1rem;
+    line-height: 1.55;
+    color: var(--fg-dim);
+  }
+
+  .process__deliverable {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    margin-top: auto;
+    padding-top: 0.75rem;
+    border-top: 1px solid var(--c-ink);
+  }
+
+  .process__deliverable strong {
+    font-size: 1rem;
+  }
+
+  @keyframes travel {
+    0%,
+    5% {
+      left: 0%;
+    }
+    17%,
+    25% {
+      left: 25%;
+    }
+    37%,
+    45% {
+      left: 50%;
+    }
+    57%,
+    65% {
+      left: 75%;
+    }
+    77%,
+    95% {
+      left: 100%;
+    }
+    100% {
+      left: 0%;
+    }
+  }
+
+  /* Empilhadas no celular, a trilha horizontal deixa de corresponder às etapas. */
+  @media (max-width: 47.99rem) {
+    .process__track {
+      display: none;
+    }
+
+    .process__step {
+      padding-left: 1.25rem;
+      border-left: 2px solid var(--c-ink);
+    }
+  }
+</style>

@@ -1,0 +1,173 @@
+---
+import Logo from '~/components/brand/Logo.astro';
+import SectionHeader from '~/components/ui/SectionHeader.astro';
+import { site } from '~/config/site';
+import { products } from '~/data/home';
+---
+
+<section id="solucoes" class="section theme-dark" aria-labelledby="solucoes-titulo">
+  <div class="container solutions">
+    <SectionHeader
+      index="04"
+      label="Soluções prontas"
+      title="Algumas coisas toda empresa precisa. Essas já estão prontas."
+      titleId="solucoes-titulo"
+      lead="Ponto e assinatura não precisam esperar um projeto. Use sozinhos ou ligados ao seu sistema sob medida — com a mesma conta e o mesmo cuidado."
+    />
+
+    <div class="solutions__grid">
+      {products.map((product, index) => (
+        <article class="solution" data-reveal style={`--reveal-delay: ${index * 120}ms`}>
+          <header class="solution__head">
+            <h3 class="solution__name">
+              <Logo size={30} product={product.product} dot={product.dot} />
+            </h3>
+            <span class="solution__status">{site.launchLabel}</span>
+          </header>
+          <p class="solution__pitch">{product.pitch}</p>
+          <ul role="list" class="solution__list">
+            {product.highlights.map((item) => (
+              <li>
+                <span aria-hidden="true">—</span>
+                {item}
+              </li>
+            ))}
+          </ul>
+          <footer class="solution__foot">
+            <span class="label solution__trial">{product.trial}</span>
+            <a
+              href={product.href}
+              class="solution__link"
+              data-track={`conhecer-${product.product}`}
+              data-track-location="solucoes"
+            >
+              Conhecer o {product.name}
+              <span aria-hidden="true">→</span>
+            </a>
+          </footer>
+        </article>
+      ))}
+    </div>
+  </div>
+</section>
+
+<style>
+  .solutions {
+    display: flex;
+    flex-direction: column;
+    gap: clamp(3rem, 6vw, 3.5rem);
+  }
+
+  .solutions__grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(26rem, 100%), 1fr));
+    gap: 1.5rem;
+  }
+
+  .solution {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    padding: clamp(1.5rem, 3vw, 2.25rem);
+    background: var(--bg-raised);
+    border: 1px solid var(--line);
+    transition: border-color 0.3s ease;
+  }
+
+  .solution:hover {
+    border-color: var(--c-ruler);
+  }
+
+  .solution__head {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+  }
+
+  .solution__name {
+    font-size: inherit;
+    letter-spacing: normal;
+  }
+
+  .solution__status {
+    padding: 0.375rem 0.5625rem;
+    border: 1px solid var(--line-strong);
+    font-family: var(--font-mono);
+    font-size: 0.6875rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--fg-dim);
+  }
+
+  .solution__pitch {
+    max-width: 32rem;
+    font-size: 1.3125rem;
+    line-height: 1.4;
+    font-weight: 600;
+  }
+
+  .solution__list li {
+    display: flex;
+    gap: 0.75rem;
+    padding-block: 0.75rem;
+    border-top: 1px solid var(--line);
+    color: var(--fg-dim);
+  }
+
+  .solution__list li span {
+    color: var(--c-ruler);
+  }
+
+  .solution__foot {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+    margin-top: auto;
+  }
+
+  .solution__trial {
+    text-transform: none;
+    letter-spacing: 0;
+  }
+
+  .solution__link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.625rem;
+    min-height: 3rem;
+    padding: 0 1.25rem;
+    border: 1px solid var(--c-ruler);
+    color: var(--c-ruler);
+    font-weight: 700;
+    font-size: 0.9375rem;
+    text-decoration: none;
+    transition:
+      background-color 0.25s ease,
+      color 0.25s ease;
+  }
+
+  /* O cartão inteiro é clicável, mas o link continua sendo o único alvo de teclado. */
+  .solution__link::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+  }
+
+  .solution__link span {
+    transition: transform 0.3s var(--ease-tool);
+  }
+
+  .solution:hover .solution__link {
+    background: var(--c-ruler);
+    color: var(--c-ink);
+  }
+
+  .solution:hover .solution__link span {
+    transform: translateX(0.25rem);
+  }
+</style>

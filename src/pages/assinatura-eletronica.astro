@@ -1,0 +1,9 @@
+---
+import SignedDocument from '~/components/illustrations/SignedDocument.astro';
+import { assinatura } from '~/data/assinatura';
+import ProductLayout from '~/layouts/ProductLayout.astro';
+---
+
+<ProductLayout page={assinatura}>
+  <SignedDocument slot="visual" />
+</ProductLayout>

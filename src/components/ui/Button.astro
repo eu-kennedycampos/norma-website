@@ -1,0 +1,97 @@
+---
+/**
+ * Botão-link. `primary` é o amarelo da régua (uma ação principal por tela);
+ * `outline` acompanha o tema da seção; `ink` é o grafite sobre fundo amarelo.
+ */
+import type { HTMLAttributes } from 'astro/types';
+
+interface Props extends Omit<HTMLAttributes<'a'>, 'class'> {
+  href: string;
+  variant?: 'primary' | 'outline' | 'ink';
+  size?: 'md' | 'lg';
+  /** Rótulo do evento `cta_click` no dataLayer. */
+  track?: string;
+  trackLocation?: string;
+  class?: string;
+}
+
+const {
+  href,
+  variant = 'primary',
+  size = 'md',
+  track,
+  trackLocation,
+  class: className,
+  ...rest
+} = Astro.props;
+---
+
+<a
+  href={href}
+  class:list={['button', `button--${variant}`, `button--${size}`, className]}
+  data-track={track}
+  data-track-location={trackLocation}
+  {...rest}
+>
+  <slot />
+</a>
+
+<style>
+  .button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem;
+    min-height: 3rem;
+    padding: 0 1.25rem;
+    border: 1px solid transparent;
+    font-weight: 700;
+    font-size: 0.9375rem;
+    line-height: 1.1;
+    text-decoration: none;
+    text-align: center;
+    transition:
+      background-color 0.25s ease,
+      border-color 0.25s ease,
+      color 0.25s ease,
+      transform 0.25s var(--ease-out);
+  }
+
+  .button--lg {
+    min-height: 3.5rem;
+    padding: 0 1.75rem;
+    font-size: 1.0625rem;
+  }
+
+  .button:active {
+    transform: translateY(1px);
+  }
+
+  .button--primary {
+    background: var(--c-ruler);
+    color: var(--c-ink);
+  }
+
+  .button--primary:hover {
+    background: var(--c-ruler-hover);
+  }
+
+  .button--outline {
+    border-color: var(--line-strong, var(--c-line-dark-2));
+    color: var(--fg, var(--c-paper));
+    font-weight: 600;
+  }
+
+  .button--outline:hover {
+    border-color: var(--accent, var(--c-ruler));
+  }
+
+  .button--ink {
+    background: var(--c-ink);
+    color: var(--c-paper);
+  }
+
+  .button--ink:hover {
+    background: var(--c-line-dark);
+  }
+</style>

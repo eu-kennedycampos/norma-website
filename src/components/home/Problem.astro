@@ -1,0 +1,95 @@
+---
+import ShelfFigure from '~/components/illustrations/ShelfFigure.astro';
+import SectionHeader from '~/components/ui/SectionHeader.astro';
+import { signals } from '~/data/home';
+---
+
+<section id="problema" class="section theme-light" aria-labelledby="problema-titulo">
+  <div class="container problem">
+    <SectionHeader
+      index="01"
+      label="A planilha que segura tudo"
+      title="Toda empresa tem uma planilha que ninguém pode apagar."
+      titleId="problema-titulo"
+      lead="Ela nasce quando o sistema de prateleira não faz o que a operação precisa. Você adapta o processo ao software, guarda o resto numa planilha paralela e paga pelas duas coisas. O que diferencia a sua empresa — o jeito de vender, produzir, pagar a equipe — é justamente o que não cabe no pacote."
+    />
+
+    <div class="problem__figures" data-reveal>
+      <ShelfFigure variant="shelf" />
+      <ShelfFigure variant="norma" />
+    </div>
+
+    <div class="problem__signals">
+      <h3 class="label">Sinais de que a sua empresa já não cabe no sistema</h3>
+      <ul role="list" class="problem__list">
+        {signals.map((signal, index) => (
+          <li class="problem__signal" data-reveal style={`--reveal-delay: ${index * 70}ms`}>
+            <span class="problem__neg" aria-hidden="true">
+              ¬
+            </span>
+            <span>{signal}</span>
+          </li>
+        ))}
+      </ul>
+    </div>
+  </div>
+</section>
+
+<style>
+  .problem {
+    display: flex;
+    flex-direction: column;
+    gap: clamp(3rem, 6vw, 4rem);
+  }
+
+  .problem__figures {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(28rem, 100%), 1fr));
+    gap: 1.5rem;
+  }
+
+  .problem__signals {
+    display: flex;
+    flex-direction: column;
+    gap: 1.125rem;
+  }
+
+  .problem__signals h3 {
+    line-height: 1.4;
+  }
+
+  .problem__list {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(14rem, 100%), 1fr));
+    gap: 1px;
+    background: var(--line);
+    border: 1px solid var(--line);
+  }
+
+  .problem__signal {
+    display: flex;
+    flex-direction: column;
+    gap: 0.625rem;
+    min-height: 9rem;
+    padding: 1.5rem;
+    background: var(--bg);
+    font-size: 1.125rem;
+    line-height: 1.35;
+    font-weight: 600;
+    transition: background-color 0.3s ease;
+  }
+
+  .problem__signal:hover {
+    background: var(--c-ruler);
+  }
+
+  .problem__neg {
+    font-size: 1.375rem;
+    font-weight: 800;
+    transition: transform 0.35s var(--ease-tool);
+  }
+
+  .problem__signal:hover .problem__neg {
+    transform: translateX(0.375rem);
+  }
+</style>

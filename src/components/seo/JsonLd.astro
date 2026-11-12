@@ -1,0 +1,13 @@
+---
+/** Dados estruturados (schema.org). Aceita um nó ou uma lista, publicados num único @graph. */
+interface Props {
+  data: Record<string, unknown> | Record<string, unknown>[];
+}
+
+const { data } = Astro.props;
+const graph = Array.isArray(data) ? data : [data];
+// `<` escapado: um texto com "</script>" dentro do JSON não fecha a tag.
+const json = JSON.stringify({ '@context': 'https://schema.org', '@graph': graph }).replace(/</g, '\\u003c');
+---
+
+<script type="application/ld+json" set:html={json} is:inline />
