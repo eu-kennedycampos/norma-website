@@ -5,6 +5,7 @@
 declare global {
   interface Window {
     dataLayer: unknown[];
+    google_tag_manager?: unknown;
   }
 }
 
@@ -15,7 +16,8 @@ function layer(): unknown[] {
   return window.dataLayer;
 }
 
-const gtmActive = () => document.documentElement.dataset.gtm === 'on';
+/** O GTM só existe depois de carregado — e, no modo básico de consentimento, só carrega com permissão. */
+const gtmActive = () => typeof window.google_tag_manager !== 'undefined';
 
 export function track(event: string, params: TrackParams = {}): void {
   layer().push({ event, ...params });

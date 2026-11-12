@@ -1,0 +1,183 @@
+---
+/**
+ * Política de cookies. A lista de categorias e de cookies vem de src/consent/config.ts —
+ * a mesma que o aviso mostra e que a revogação usa para apagar —, então nunca fica desatualizada.
+ */
+import { categoryInfo, cookies } from '~/consent/config';
+import { consentEnabled } from '~/config/site';
+import LegalLayout from '~/layouts/LegalLayout.astro';
+---
+
+<LegalLayout
+  title="Política de cookies"
+  description="Quais cookies o site da Norma usa, para quê, por quanto tempo, e como mudar a sua escolha."
+  lead="Quais cookies este site usa, para quê e por quanto tempo — e como mudar a sua escolha a qualquer momento."
+  updatedAt="12 de novembro de 2026"
+>
+  <section>
+    <h2>O que são cookies</h2>
+    <p>
+      Cookies são pequenos arquivos que um site grava no seu navegador. Usamos também o armazenamento local do
+      navegador, que funciona do mesmo jeito. Nenhum deles guarda o seu nome ou contato.
+    </p>
+  </section>
+
+  <section>
+    <h2>As categorias</h2>
+    <ul>
+      {categoryInfo.map((category) => (
+        <li>
+          <strong>{category.title}.</strong> {category.description}
+          {category.id === 'necessary' ? ' Sempre ativos.' : ' Só com a sua permissão.'}
+        </li>
+      ))}
+    </ul>
+    <p>
+      Medição e anúncios começam desligados. Recusar não muda nada no que você vê nem no envio do formulário.
+      Se o seu navegador enviar o sinal Global Privacy Control, a tela de preferências avisa e Anúncios
+      continua desligado.
+    </p>
+  </section>
+
+  <section>
+    <h2>Os cookies, um a um</h2>
+    <p>Os do Google só existem se a ferramenta estiver ligada e se você tiver permitido a categoria.</p>
+    <div class="cookie-table">
+      <table>
+        <thead>
+          <tr>
+            <th scope="col">Nome</th>
+            <th scope="col">De quem</th>
+            <th scope="col">Categoria</th>
+            <th scope="col">Para quê</th>
+            <th scope="col">Duração</th>
+          </tr>
+        </thead>
+        <tbody>
+          {cookies.map((cookie) => (
+            <tr>
+              <th scope="row">
+                <code>{cookie.name}</code>
+              </th>
+              <td data-label="De quem">{cookie.provider}</td>
+              <td data-label="Categoria">{categoryInfo.find((c) => c.id === cookie.category)?.title}</td>
+              <td data-label="Para quê">{cookie.purpose}</td>
+              <td data-label="Duração">{cookie.duration}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section>
+    <h2>Como mudar a sua escolha</h2>
+    <p>
+      A escolha vale por 12 meses e pode ser mudada quando você quiser. Ao retirar uma permissão, apagamos na
+      hora os cookies daquela categoria. Você também pode apagar os cookies pelas configurações do seu
+      navegador.
+    </p>
+    {consentEnabled && (
+      <p>
+        <button type="button" class="cookie-open" data-consent-open>
+          Abrir preferências de cookies
+        </button>
+      </p>
+    )}
+    <p>
+      Mais sobre como tratamos dados pessoais na <a href="/privacidade">Política de privacidade</a>.
+    </p>
+  </section>
+</LegalLayout>
+
+<style>
+  .cookie-table {
+    overflow-x: auto;
+    border: 1px solid var(--line);
+  }
+
+  table {
+    width: 100%;
+    min-width: 40rem;
+    border-collapse: collapse;
+  }
+
+  th,
+  td {
+    padding: 0.875rem 1rem;
+    text-align: left;
+    vertical-align: top;
+    border-top: 1px solid var(--line);
+    font-size: 0.9375rem;
+    line-height: 1.5;
+  }
+
+  thead th {
+    border-top: 0;
+    font-family: var(--font-mono);
+    font-size: 0.6875rem;
+    font-weight: 500;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--label);
+    background: var(--bg-raised);
+  }
+
+  code {
+    font-family: var(--font-mono);
+    font-size: 0.8125rem;
+    color: var(--fg);
+    white-space: nowrap;
+  }
+
+  .cookie-open {
+    min-height: 3rem;
+    padding: 0 1.25rem;
+    border: 2px solid var(--c-ink);
+    background: var(--c-ink);
+    color: var(--c-paper);
+    font-weight: 700;
+    cursor: pointer;
+  }
+
+  .cookie-open:hover {
+    background: var(--c-line-dark);
+  }
+
+  /* No celular a tabela vira fichas, como a do diferencial. */
+  @media (max-width: 44.99rem) {
+    .cookie-table {
+      border: 0;
+    }
+
+    table,
+    tbody,
+    tr,
+    th,
+    td {
+      display: block;
+      min-width: 0;
+    }
+
+    thead {
+      display: none;
+    }
+
+    tr {
+      padding: 0.75rem 0;
+      border-top: 1px solid var(--line);
+    }
+
+    th,
+    td {
+      border: 0;
+      padding: 0.25rem 0;
+    }
+
+    td::before {
+      content: attr(data-label) ': ';
+      font-weight: 600;
+      color: var(--fg);
+    }
+  }
+</style>

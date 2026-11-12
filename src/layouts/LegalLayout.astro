@@ -1,0 +1,94 @@
+---
+/** Páginas legais (privacidade, cookies): cabeçalho com a data de atualização e texto corrido. */
+import BaseLayout from './BaseLayout.astro';
+
+interface Props {
+  title: string;
+  description: string;
+  lead: string;
+  updatedAt: string;
+}
+
+const { title, description, lead, updatedAt } = Astro.props;
+---
+
+<BaseLayout title={title} description={description}>
+  <article class="legal theme-light">
+    <div class="container legal__inner">
+      <header class="legal__header">
+        <p class="label">Atualizada em {updatedAt}</p>
+        <h1 class="legal__title">{title}</h1>
+        <p class="legal__lead">{lead}</p>
+      </header>
+      <slot />
+    </div>
+  </article>
+</BaseLayout>
+
+<style>
+  .legal__inner {
+    display: flex;
+    flex-direction: column;
+    gap: 2.5rem;
+    max-width: 52rem;
+    margin-inline: 0;
+    padding-block: clamp(3rem, 8vw, 6rem);
+  }
+
+  @media (min-width: 60rem) {
+    .legal__inner {
+      margin-inline: auto;
+    }
+  }
+
+  .legal__header {
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+    padding-bottom: 2rem;
+    border-bottom: 1px solid var(--line-strong);
+  }
+
+  .legal__title {
+    font-size: var(--fs-h2);
+  }
+
+  .legal__lead {
+    font-size: var(--fs-lead);
+    color: var(--fg-dim);
+  }
+
+  /* O conteúdo vem do slot (outra página): por isso os seletores globais dentro de .legal. */
+  .legal :global(section) {
+    display: flex;
+    flex-direction: column;
+    gap: 0.875rem;
+  }
+
+  .legal :global(h2) {
+    font-size: 1.5rem;
+    letter-spacing: -0.02em;
+  }
+
+  .legal :global(p),
+  .legal :global(li) {
+    font-size: 1.0625rem;
+    line-height: 1.7;
+    color: var(--fg-dim);
+  }
+
+  .legal :global(ul:not([role='list'])) {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    padding-left: 1.25rem;
+  }
+
+  .legal :global(strong) {
+    color: var(--fg);
+  }
+
+  .legal :global(a) {
+    text-underline-offset: 0.2em;
+  }
+</style>

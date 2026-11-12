@@ -1,0 +1,50 @@
+---
+/**
+ * Primeiro script da página, antes de qualquer ferramenta de terceiro:
+ *  1. lê a escolha guardada (vencida ou de outra versão conta como "não escolheu");
+ *  2. grava o estado padrão do Google Consent Mode v2 — negado, salvo permissão já dada;
+ *  3. carrega o GTM: no modo básico só se já houver permissão; no avançado, sempre (sem cookies).
+ * Precisa ficar em linha e sem import: roda antes do bundle e repete de propósito a regra de store.ts.
+ */
+import { PUBLIC_CONSENT_MODE, PUBLIC_GTM_ID } from 'astro:env/client';
+import { CONSENT_STORAGE_KEY, CONSENT_VERSION, googleConsentTypes } from '~/consent/config';
+
+const gtmId = PUBLIC_GTM_ID?.trim() ?? '';
+const mode = PUBLIC_CONSENT_MODE;
+---
+
+<script
+  is:inline
+  define:vars={{ key: CONSENT_STORAGE_KEY, version: CONSENT_VERSION, types: googleConsentTypes, gtmId, mode }}
+>
+  window.dataLayer = window.dataLayer || [];
+  function gtag() {
+    window.dataLayer.push(arguments);
+  }
+  var choices = null;
+  try {
+    var record = JSON.parse(window.localStorage.getItem(key) || 'null');
+    if (record && record.version === version && Date.parse(record.expires) > Date.now())
+      choices = record.choices;
+  } catch (e) {}
+  var state = { functionality_storage: 'granted', security_storage: 'granted', wait_for_update: 500 };
+  var granted = false;
+  for (var category in types) {
+    var on = !!(choices && choices[category]);
+    granted = granted || on;
+    for (var i = 0; i < types[category].length; i++) state[types[category][i]] = on ? 'granted' : 'denied';
+  }
+  gtag('consent', 'default', state);
+  gtag('set', 'ads_data_redaction', !(choices && choices.marketing));
+  gtag('set', 'url_passthrough', true);
+  document.documentElement.dataset.consent = choices ? 'decidido' : 'pendente';
+
+  if (gtmId && (mode === 'advanced' || granted)) {
+    window.__normaGtmLoaded = true;
+    window.dataLayer.push({ 'gtm.start': Date.now(), event: 'gtm.js' });
+    var script = document.createElement('script');
+    script.async = true;
+    script.src = 'https://www.googletagmanager.com/gtm.js?id=' + encodeURIComponent(gtmId);
+    document.head.appendChild(script);
+  }
+</script>

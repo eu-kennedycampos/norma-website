@@ -1,4 +1,9 @@
-import { PUBLIC_CONTACT_EMAIL, PUBLIC_WHATSAPP } from 'astro:env/client';
+import {
+  PUBLIC_CONSENT_PREVIEW,
+  PUBLIC_CONTACT_EMAIL,
+  PUBLIC_GTM_ID,
+  PUBLIC_WHATSAPP,
+} from 'astro:env/client';
 
 /**
  * Os dados institucionais, num lugar só. O que ainda não foi definido fica `null`
@@ -40,6 +45,12 @@ export const site: SiteConfig = {
   email: PUBLIC_CONTACT_EMAIL || null,
   launchLabel: 'Lançamento em 2027',
 };
+
+/**
+ * O aviso de cookies só existe quando há o que consentir: uma ferramenta de medição ligada (GTM).
+ * PUBLIC_CONSENT_PREVIEW=true força o aviso, para ver e testar antes de ligar o GTM.
+ */
+export const consentEnabled = Boolean(PUBLIC_GTM_ID?.trim()) || PUBLIC_CONSENT_PREVIEW;
 
 export interface NavItem {
   label: string;

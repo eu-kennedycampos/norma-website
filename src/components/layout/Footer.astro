@@ -1,6 +1,6 @@
 ---
 import Logo from '~/components/brand/Logo.astro';
-import { mainNav, productLinks, site } from '~/config/site';
+import { consentEnabled, mainNav, productLinks, site } from '~/config/site';
 import { whatsappUrl } from '~/lib/contact';
 
 const year = new Date().getFullYear();
@@ -69,7 +69,13 @@ const legalLine = [site.legalName, site.cnpj && `CNPJ ${site.cnpj}`, site.city].
     <div class="footer__legal">
       <span>{legalLine}</span>
       <span class="footer__legal-links">
-        <a href="/privacidade">Política de privacidade</a>
+        <a href="/privacidade">Privacidade</a>
+        <a href="/cookies">Cookies</a>
+        {consentEnabled && (
+          <button type="button" class="footer__consent" data-consent-open>
+            Preferências de cookies
+          </button>
+        )}
         <span>© {year} Norma</span>
       </span>
     </div>
@@ -152,7 +158,24 @@ const legalLine = [site.legalName, site.cnpj && `CNPJ ${site.cnpj}`, site.city].
 
   .footer__legal-links {
     display: flex;
-    gap: 1.5rem;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.5rem 1.5rem;
+  }
+
+  .footer__consent {
+    padding: 0;
+    border: 0;
+    background: none;
+    color: inherit;
+    font: inherit;
+    text-decoration: underline;
+    text-underline-offset: 0.2em;
+    cursor: pointer;
+  }
+
+  .footer__consent:hover {
+    color: var(--c-ruler);
   }
 
   .footer__legal a {

@@ -36,6 +36,15 @@ export default defineConfig({
       PUBLIC_LEAD_ENDPOINT: envField.string({ context: 'client', access: 'public', optional: true }),
       PUBLIC_WHATSAPP: envField.string({ context: 'client', access: 'public', optional: true }),
       PUBLIC_CONTACT_EMAIL: envField.string({ context: 'client', access: 'public', optional: true }),
+      // Consentimento de cookies: ver src/consent e a seção "Cookies e consentimento" do README.
+      PUBLIC_CONSENT_MODE: envField.enum({
+        values: ['basic', 'advanced'],
+        context: 'client',
+        access: 'public',
+        default: 'basic',
+      }),
+      PUBLIC_CONSENT_ENDPOINT: envField.string({ context: 'client', access: 'public', optional: true }),
+      PUBLIC_CONSENT_PREVIEW: envField.boolean({ context: 'client', access: 'public', default: false }),
     },
   },
 });

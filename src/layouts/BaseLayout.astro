@@ -3,16 +3,16 @@ import '@fontsource-variable/archivo/wdth.css';
 import '@fontsource-variable/martian-mono/wght.css';
 import '~/styles/global.css';
 import archivoLatin from '@fontsource-variable/archivo/files/archivo-latin-wdth-normal.woff2?url';
-import { PUBLIC_GTM_ID } from 'astro:env/client';
+import { PUBLIC_CONSENT_MODE, PUBLIC_GTM_ID } from 'astro:env/client';
 
-import ConsentBanner from '~/components/layout/ConsentBanner.astro';
+import ConsentHead from '~/components/consent/ConsentHead.astro';
+import ConsentManager from '~/components/consent/ConsentManager.astro';
 import Footer from '~/components/layout/Footer.astro';
-import GtmHead from '~/components/layout/GtmHead.astro';
 import Header from '~/components/layout/Header.astro';
 import MobileCta from '~/components/layout/MobileCta.astro';
 import JsonLd from '~/components/seo/JsonLd.astro';
 import Seo, { type SeoProps } from '~/components/seo/Seo.astro';
-import { site } from '~/config/site';
+import { consentEnabled, site } from '~/config/site';
 import { organization, website } from '~/lib/schema';
 
 interface Props extends SeoProps {
@@ -33,17 +33,19 @@ const {
 
 const base = Astro.site ?? new URL(Astro.url.origin);
 const gtmId = PUBLIC_GTM_ID?.trim();
+// O <noscript> do GTM não passa pelo consentimento: só no modo avançado, em que o GTM carrega sempre.
+const gtmNoscript = gtmId && PUBLIC_CONSENT_MODE === 'advanced';
 ---
 
 <!doctype html>
-<html lang={site.lang} data-gtm={gtmId ? 'on' : 'off'}>
+<html lang={site.lang}>
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
     <script is:inline>
       document.documentElement.classList.add('js');
     </script>
-    <GtmHead />
+    <ConsentHead />
     <Seo {...seo} />
     <meta name="theme-color" content={site.themeColor} />
     <meta name="color-scheme" content="dark light" />
@@ -56,7 +58,7 @@ const gtmId = PUBLIC_GTM_ID?.trim();
     <JsonLd data={[organization(base), website(base), ...schema]} />
   </head>
   <body>
-    {gtmId && (
+    {gtmNoscript && (
       <noscript>
         <iframe
           src={`https://www.googletagmanager.com/ns.html?id=${gtmId}`}
@@ -76,7 +78,7 @@ const gtmId = PUBLIC_GTM_ID?.trim();
     </main>
     <Footer />
     {!bare && <MobileCta cta={cta} />}
-    <ConsentBanner />
+    {consentEnabled && <ConsentManager />}
   </body>
 </html>
 

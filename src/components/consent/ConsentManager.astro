@@ -1,0 +1,484 @@
+---
+/**
+ * O aviso de cookies e a tela de preferências.
+ * Regras (guia de cookies da ANPD): recusar é tão fácil quanto aceitar — os dois botões têm o
+ * mesmo peso —, nada vem marcado, e a escolha pode ser mudada a qualquer momento pelo rodapé.
+ * O aviso nasce escondido no HTML e só o script o mostra, para quem ainda não escolheu.
+ */
+import { categoryInfo, cookies } from '~/consent/config';
+
+const optional = categoryInfo.filter((c) => c.id !== 'necessary');
+const necessary = categoryInfo.find((c) => c.id === 'necessary')!;
+const cookiesOf = (id: string) => cookies.filter((c) => c.category === id);
+---
+
+<section class="consent-banner" data-consent-banner hidden aria-labelledby="consent-banner-title">
+  <div class="consent-banner__text">
+    <p id="consent-banner-title" class="consent-banner__title">
+      Cookies
+    </p>
+    <p>
+      Usamos cookies para medir o uso do site e o resultado dos nossos anúncios — é assim que melhoramos o que
+      construímos. Nada disso é ativado sem a sua permissão. <a href="/cookies">Política de cookies</a>
+    </p>
+  </div>
+  <div class="consent-banner__actions">
+    <button type="button" class="consent-button" data-consent-action="aceitar-todos">
+      Aceitar
+    </button>
+    <button type="button" class="consent-button" data-consent-action="recusar-todos">
+      Recusar
+    </button>
+    <button type="button" class="consent-link" data-consent-action="abrir">
+      Personalizar
+    </button>
+  </div>
+</section>
+
+<dialog class="consent-dialog" data-consent-dialog aria-labelledby="consent-dialog-title">
+  <form method="dialog" class="consent-dialog__form" data-consent-form>
+    <header class="consent-dialog__head">
+      <h2 id="consent-dialog-title">Preferências de cookies</h2>
+      <button type="button" class="consent-dialog__close" data-consent-action="fechar" aria-label="Fechar">
+        <span aria-hidden="true">×</span>
+      </button>
+    </header>
+
+    <p class="consent-dialog__intro">
+      Escolha o que pode ser ativado. Você muda de ideia quando quiser em “Preferências de cookies”, no
+      rodapé.
+    </p>
+    <p class="consent-dialog__gpc" data-consent-gpc hidden>
+      O seu navegador pede para não compartilhar dados com anunciantes (Global Privacy Control). Respeitamos o
+      pedido: Anúncios fica desligado, a menos que você o ligue aqui.
+    </p>
+
+    <ul class="consent-dialog__list" role="list">
+      <li class="consent-category">
+        <div class="consent-category__row">
+          <span class="consent-category__title">{necessary.title}</span>
+          <span class="consent-category__always">Sempre ativos</span>
+        </div>
+        <p class="consent-category__text">{necessary.description}</p>
+      </li>
+      {optional.map((category) => (
+        <li class="consent-category">
+          <div class="consent-category__row">
+            <label class="consent-category__title" for={`consent-${category.id}`}>
+              {category.title}
+            </label>
+            <input
+              class="consent-switch"
+              type="checkbox"
+              role="switch"
+              id={`consent-${category.id}`}
+              name={category.id}
+              aria-describedby={`consent-${category.id}-text`}
+            />
+          </div>
+          <p class="consent-category__text" id={`consent-${category.id}-text`}>
+            {category.description}
+          </p>
+          {cookiesOf(category.id).length > 0 && (
+            <details class="consent-category__cookies">
+              <summary>Ver cookies</summary>
+              <ul role="list">
+                {cookiesOf(category.id).map((cookie) => (
+                  <li>
+                    <code>{cookie.name}</code> · {cookie.provider} · {cookie.duration}
+                  </li>
+                ))}
+              </ul>
+            </details>
+          )}
+        </li>
+      ))}
+    </ul>
+
+    <footer class="consent-dialog__actions">
+      <button type="button" class="consent-button" data-consent-action="recusar-todos">
+        Recusar todos
+      </button>
+      <button type="button" class="consent-button" data-consent-action="salvar">
+        Salvar escolhas
+      </button>
+      <button type="button" class="consent-button" data-consent-action="aceitar-todos">
+        Aceitar todos
+      </button>
+    </footer>
+  </form>
+</dialog>
+
+<script>
+  import { ALL_CONSENT, NO_CONSENT, type ConsentChoices, type ConsentMethod } from '~/consent/config';
+  import { consent } from '~/consent/manager';
+
+  const banner = document.querySelector<HTMLElement>('[data-consent-banner]');
+  const dialog = document.querySelector<HTMLDialogElement>('[data-consent-dialog]');
+  const form = document.querySelector<HTMLFormElement>('[data-consent-form]');
+
+  consent.init();
+
+  // Nada vem marcado: antes da primeira escolha, todas as categorias aparecem desligadas.
+  function fillForm(): void {
+    if (!form) return;
+    for (const [category, value] of Object.entries(consent.get())) {
+      const input = form.elements.namedItem(category);
+      if (input instanceof HTMLInputElement) input.checked = value;
+    }
+    const gpcNote = form.querySelector<HTMLElement>('[data-consent-gpc]');
+    if (gpcNote) gpcNote.hidden = !consent.prefersPrivacy();
+  }
+
+  function readForm(): ConsentChoices {
+    const choices = { ...NO_CONSENT };
+    for (const category of Object.keys(choices) as (keyof ConsentChoices)[]) {
+      const input = form?.elements.namedItem(category);
+      choices[category] = input instanceof HTMLInputElement && input.checked;
+    }
+    return choices;
+  }
+
+  function hideBanner(): void {
+    if (!banner || banner.hidden) return;
+    banner.dataset.closing = 'true';
+    window.setTimeout(() => {
+      banner.hidden = true;
+      delete banner.dataset.closing;
+    }, 300);
+  }
+
+  function decide(choices: ConsentChoices, method: ConsentMethod): void {
+    consent.set(choices, method);
+    hideBanner();
+    if (dialog?.open) dialog.close();
+  }
+
+  function openPreferences(): void {
+    if (!dialog) return;
+    fillForm();
+    dialog.showModal();
+  }
+
+  document.addEventListener('click', (event) => {
+    const target =
+      event.target instanceof Element ? event.target.closest<HTMLElement>('[data-consent-action]') : null;
+    if (!target) return;
+    switch (target.dataset.consentAction) {
+      case 'aceitar-todos':
+        decide({ ...ALL_CONSENT }, 'aceitar-todos');
+        break;
+      case 'recusar-todos':
+        decide({ ...NO_CONSENT }, 'recusar-todos');
+        break;
+      case 'salvar':
+        decide(readForm(), 'personalizado');
+        break;
+      case 'abrir':
+        openPreferences();
+        break;
+      case 'fechar':
+        dialog?.close();
+        break;
+    }
+  });
+
+  // Qualquer botão do site com data-consent-open (rodapé, política) abre as preferências.
+  document.addEventListener('click', (event) => {
+    if (event.target instanceof Element && event.target.closest('[data-consent-open]')) {
+      event.preventDefault();
+      openPreferences();
+    }
+  });
+  consent.onOpen(openPreferences);
+
+  // Clicar fora do conteúdo fecha, como o Esc.
+  dialog?.addEventListener('click', (event) => {
+    if (event.target === dialog) dialog.close();
+  });
+
+  if (banner && !consent.decided()) banner.hidden = false;
+</script>
+
+<style>
+  .consent-banner {
+    position: fixed;
+    left: 1rem;
+    bottom: calc(1rem + env(safe-area-inset-bottom));
+    z-index: 60;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    width: min(28rem, calc(100% - 2rem));
+    padding: 1.25rem;
+    background: var(--c-paper);
+    color: var(--c-ink);
+    border: 1px solid var(--c-ink);
+    box-shadow: 0 24px 60px rgb(0 0 0 / 0.4);
+    animation: consent-in 0.5s var(--ease-tool);
+    transition:
+      opacity 0.3s ease,
+      transform 0.3s ease;
+  }
+
+  .consent-banner[hidden] {
+    display: none;
+  }
+
+  .consent-banner[data-closing='true'] {
+    opacity: 0;
+    transform: translateY(1rem);
+  }
+
+  .consent-banner__text {
+    display: flex;
+    flex-direction: column;
+    gap: 0.375rem;
+    font-size: 0.9375rem;
+    line-height: 1.5;
+    color: var(--c-text-light-dim);
+  }
+
+  .consent-banner__title {
+    font-weight: 800;
+    color: var(--c-ink);
+  }
+
+  .consent-banner a {
+    color: var(--c-ink);
+    text-underline-offset: 0.2em;
+  }
+
+  .consent-banner__actions {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.5rem;
+  }
+
+  .consent-banner__actions .consent-link {
+    grid-column: 1 / -1;
+  }
+
+  /* Aceitar e recusar com o mesmo peso visual: nenhum dos dois é o "caminho fácil". */
+  .consent-button {
+    min-height: 2.75rem;
+    padding: 0 1rem;
+    border: 2px solid var(--c-ink);
+    background: var(--c-ink);
+    color: var(--c-paper);
+    font-weight: 700;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+  }
+
+  .consent-button:hover {
+    background: var(--c-line-dark);
+  }
+
+  .consent-link {
+    min-height: 2.75rem;
+    border: 0;
+    background: none;
+    color: var(--c-ink);
+    font-weight: 600;
+    text-decoration: underline;
+    text-underline-offset: 0.2em;
+    cursor: pointer;
+  }
+
+  .consent-dialog {
+    width: min(38rem, calc(100% - 2rem));
+    max-height: min(46rem, calc(100dvh - 2rem));
+    padding: 0;
+    border: 1px solid var(--c-ink);
+    background: var(--c-paper);
+    color: var(--c-ink);
+  }
+
+  .consent-dialog::backdrop {
+    background: rgb(11 11 10 / 0.7);
+    backdrop-filter: blur(3px);
+  }
+
+  .consent-dialog[open] {
+    animation: consent-in 0.4s var(--ease-tool);
+  }
+
+  .consent-dialog__form {
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+    padding: clamp(1.25rem, 4vw, 2rem);
+  }
+
+  .consent-dialog__head {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+  }
+
+  .consent-dialog__head h2 {
+    font-size: 1.625rem;
+    letter-spacing: -0.02em;
+  }
+
+  .consent-dialog__close {
+    display: grid;
+    place-items: center;
+    width: 2.75rem;
+    height: 2.75rem;
+    border: 1px solid var(--c-line-light);
+    background: none;
+    font-size: 1.5rem;
+    line-height: 1;
+    cursor: pointer;
+  }
+
+  .consent-dialog__intro,
+  .consent-dialog__gpc {
+    font-size: 0.9375rem;
+    line-height: 1.55;
+    color: var(--c-text-light-dim);
+  }
+
+  .consent-dialog__gpc {
+    padding: 0.75rem 1rem;
+    background: var(--c-ruler-soft);
+    color: var(--c-ink);
+  }
+
+  .consent-dialog__gpc[hidden] {
+    display: none;
+  }
+
+  .consent-dialog__list {
+    border-top: 1px solid var(--c-line-light);
+  }
+
+  .consent-category {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    padding-block: 1rem;
+    border-bottom: 1px solid var(--c-line-light);
+  }
+
+  .consent-category__row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+  }
+
+  .consent-category__title {
+    font-weight: 700;
+    font-size: 1.0625rem;
+  }
+
+  .consent-category__always {
+    font-family: var(--font-mono);
+    font-size: 0.6875rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--c-steel-dark);
+  }
+
+  .consent-category__text {
+    font-size: 0.875rem;
+    line-height: 1.55;
+    color: var(--c-text-light-dim);
+  }
+
+  .consent-category__cookies {
+    font-size: 0.8125rem;
+    color: var(--c-steel-dark);
+  }
+
+  .consent-category__cookies summary {
+    cursor: pointer;
+    font-weight: 600;
+    min-height: 2rem;
+    display: flex;
+    align-items: center;
+  }
+
+  .consent-category__cookies ul {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    padding-top: 0.25rem;
+  }
+
+  .consent-category__cookies code {
+    font-family: var(--font-mono);
+    color: var(--c-ink);
+  }
+
+  /* Interruptor: trilho grafite, peça amarela que encaixa à direita quando ligado. */
+  .consent-switch {
+    position: relative;
+    flex: none;
+    width: 3.25rem;
+    height: 1.75rem;
+    margin: 0;
+    border: 2px solid var(--c-ink);
+    background: var(--c-paper);
+    appearance: none;
+    cursor: pointer;
+    transition: background-color 0.25s ease;
+  }
+
+  .consent-switch::after {
+    content: '';
+    position: absolute;
+    top: 0.1875rem;
+    left: 0.1875rem;
+    width: 1.125rem;
+    height: 1.125rem;
+    background: var(--c-ink);
+    transition:
+      transform 0.3s var(--ease-tool),
+      background-color 0.25s ease;
+  }
+
+  .consent-switch:checked {
+    background: var(--c-ink);
+  }
+
+  .consent-switch:checked::after {
+    transform: translateX(1.5rem);
+    background: var(--c-ruler);
+  }
+
+  .consent-switch:focus-visible {
+    outline: 3px solid var(--c-ink);
+    outline-offset: 3px;
+  }
+
+  .consent-dialog__actions {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(10rem, 100%), 1fr));
+    gap: 0.5rem;
+  }
+
+  @keyframes consent-in {
+    from {
+      opacity: 0;
+      transform: translateY(1rem);
+    }
+  }
+
+  /* No celular, o aviso ocupa a largura e sobe acima da barra de ação. */
+  @media (max-width: 47.99rem) {
+    .consent-banner {
+      left: 0.75rem;
+      bottom: calc(0.75rem + env(safe-area-inset-bottom));
+      width: calc(100% - 1.5rem);
+    }
+
+    :global(html:has([data-consent-banner]:not([hidden])) [data-mobile-cta]) {
+      display: none;
+    }
+  }
+</style>

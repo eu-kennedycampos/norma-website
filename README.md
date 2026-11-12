@@ -44,7 +44,8 @@ src/
     seo/              meta tags e dados estruturados
     ui/               botão, cabeçalho de seção, régua, perguntas
   layouts/            BaseLayout (toda página) e ProductLayout (páginas de produto)
-  lib/                medição, origem da visita, consentimento, schema.org
+  consent/            consentimento de cookies: categorias, registro, Consent Mode, API
+  lib/                medição, origem da visita, schema.org
   scripts/            o JavaScript do navegador
   styles/             tokens da marca e base
 scripts/render-images.mjs   gera as imagens de compartilhamento e os ícones
@@ -65,14 +66,55 @@ variáveis de tema (`--bg`, `--fg`, `--line`…), então funcionam sobre grafite
 
 As `PUBLIC_*` vão para o navegador: nunca coloque segredo nelas.
 
+## Cookies e consentimento
+
+Gerenciador próprio, em `src/consent/`, sem biblioteca de terceiros e sem dependência do site — pensado para ser
+levado depois aos produtos da Norma.
+
+- **Categorias** (`src/consent/config.ts`): Necessários (sempre ativos), Medição de uso e Anúncios. Cada cookie
+  está cadastrado com a categoria, o fornecedor, a finalidade e a duração; o aviso, a tela de preferências, a página
+  `/cookies` e a limpeza na revogação leem da mesma lista.
+- **Regras da ANPD**: aceitar e recusar com o mesmo peso, nada vem marcado, a escolha muda a qualquer momento por
+  "Preferências de cookies" no rodapé. Vale 12 meses; subir `CONSENT_VERSION` faz todo mundo responder de novo.
+- **Revogação**: apaga na hora os cookies da categoria retirada; se um script dela já rodou, a página recarrega.
+- **Prova do consentimento** (LGPD art. 8º, § 2º): cada escolha gera um registro (`id`, versão, escolhas, método,
+  data, validade). Com `PUBLIC_CONSENT_ENDPOINT`, o registro vai por POST para o servidor guardar o histórico.
+- **Global Privacy Control**: se o navegador pedir, a tela de preferências avisa e Anúncios fica desligado.
+- **Google Consent Mode v2**: o padrão (negado, ou a escolha guardada) entra no `<head>` antes de qualquer
+  ferramenta. `PUBLIC_CONSENT_MODE=basic` (padrão) só carrega o GTM depois de alguma permissão; `advanced`
+  carrega sempre e, sem permissão, o Google recebe só sinais sem cookies (melhora a modelagem de conversões).
+- **Script de terceiro fora do GTM**: use `<ConsentScript category="analytics" src="…" />` — ele só roda com a
+  categoria permitida.
+- **Ver o aviso sem GTM**: `PUBLIC_CONSENT_PREVIEW=true` no `.env`.
+
+API no navegador (`src/consent/manager.ts`): `consent.get()`, `consent.decided()`, `consent.set(escolhas, método)`,
+`consent.onChange(fn)`, `consent.open()`.
+
+Formato do registro enviado ao `PUBLIC_CONSENT_ENDPOINT`:
+
+```json
+{
+  "id": "uuid aleatório, o mesmo para a mesma pessoa",
+  "version": 2,
+  "choices": { "analytics": true, "marketing": false },
+  "method": "aceitar-todos | recusar-todos | personalizado",
+  "at": "2026-11-12T12:00:00.000Z",
+  "expires": "2027-11-12T12:00:00.000Z",
+  "page": "/"
+}
+```
+
 ## Anúncios e medição
 
-- **Consent Mode v2**: tudo começa negado; o aviso de cookies libera. O padrão entra antes do GTM carregar.
+- **No GTM**: em Administrador › Configurações do contêiner, ative a visão geral de consentimento. As tags do
+  Google (GA4, Google Ads) já respeitam o Consent Mode sozinhas; para outras, exija `analytics_storage` ou
+  `ad_storage` em "Configurações de consentimento" da tag. O evento `consent_update` (com `consent_analytics`,
+  `consent_marketing` e `consent_method`) serve de acionador para o que precisar reagir à escolha.
 - **Eventos no `dataLayer`**: `generate_lead` (lead enviado, com `lead_interest` e `method`), `form_start`,
   `form_error`, `cta_click`, `click_whatsapp`, `click_email`, `consent_update`. Configure no GTM a tag de conversão
   do Google Ads em `generate_lead` — ou, como alternativa, na visualização de `/obrigado`.
 - **Origem do lead**: UTMs, `gclid`, `gbraid`, `wbraid` e `fbclid` são guardados por 90 dias no navegador e vão
-  junto com o formulário, em `attribution`.
+  junto com o formulário, em `attribution` (legítimo interesse, descrito na política de privacidade).
 
 Formato do lead enviado ao `PUBLIC_LEAD_ENDPOINT`:
 
@@ -116,6 +158,8 @@ location /_astro/ {
 - [ ] Domínio definido em `SITE_URL`.
 - [ ] CNPJ e cidade em `src/config/site.ts`.
 - [ ] WhatsApp, e-mail e o destino do formulário nas variáveis de ambiente.
-- [ ] GTM com a conversão do Google Ads em `generate_lead`.
+- [ ] GTM com a conversão do Google Ads em `generate_lead` e a visão geral de consentimento ativa.
+- [ ] Endpoint para guardar os registros de consentimento (`PUBLIC_CONSENT_ENDPOINT`).
+- [ ] Lista de cookies em `src/consent/config.ts` conferida com as ferramentas realmente ligadas no GTM.
 - [ ] Política de privacidade revisada pelo jurídico.
 - [ ] Busca da marca "Norma" no INPI (classes 9 e 42) concluída.

@@ -1,0 +1,31 @@
+---
+/**
+ * Script de terceiro que só roda com permissão. Nasce como texto inerte e o gerenciador
+ * o transforma em script de verdade quando todas as categorias pedidas estiverem liberadas.
+ *
+ *   <ConsentScript category="analytics" src="https://www.clarity.ms/tag/ID" />
+ *   <ConsentScript category="marketing" code="fbq('init', 'ID'); fbq('track', 'PageView');" />
+ *
+ * Prefira o Google Tag Manager para ferramentas novas: este componente é para o que não passa por ele.
+ */
+import type { ConsentCategory } from '~/consent/config';
+
+interface Props {
+  category: ConsentCategory | ConsentCategory[];
+  src?: string;
+  code?: string;
+  async?: boolean;
+}
+
+const { category, src, code = '', async = true } = Astro.props;
+const categories = Array.isArray(category) ? category.join(' ') : category;
+---
+
+<script
+  is:inline
+  type="text/plain"
+  data-consent={categories}
+  data-src={src}
+  async={src ? async : undefined}
+  set:html={code}
+/>
